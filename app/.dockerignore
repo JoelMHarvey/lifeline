@@ -1,0 +1,6 @@
+node_modules
+lifeline.db*
+*.log
+test
+README.md
+DEPLOY.md

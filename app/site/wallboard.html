@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Wallboard{{#prototype}} (prototype){{/prototype}}</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat { text-align: center; padding: 18px 10px; }
+  .stat .num { font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .num.alert { color: var(--danger); }
+  .stat .label { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td, th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; } .grid { grid-template-columns: repeat(2, 1fr); } .stat .num { font-size: 28px; } }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">{{name}} — live wallboard <span class="muted" id="asOf"></span></h1>
+<div class="grid" id="stats"></div>
+<div class="cols">
+  <div class="panel">
+    <h3 class="muted" style="margin-bottom:8px">WORKERS</h3>
+    <table id="workers"></table>
+  </div>
+  <div class="panel">
+    <h3 class="muted" style="margin-bottom:8px">OPEN HELP REQUESTS</h3>
+    <div id="help"><p class="muted">None.</p></div>
+    <h3 class="muted" style="margin:14px 0 8px">NEXT 24H — NOT CONFIRMED</h3>
+    <div id="unconfirmed"><p class="muted">All confirmed.</p></div>
+    <h3 class="muted" style="margin:14px 0 8px">HIGHLIGHTED CONTACTS (7 DAYS)</h3>
+    <div id="highlights"><p class="muted">None.</p></div>
+  </div>
+</div>
+<script src="wallboard.js"></script>
+</body>
+</html>

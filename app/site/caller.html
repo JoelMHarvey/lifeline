@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{name}} Chat{{#prototype}} (prototype){{/prototype}}</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { display: flex; justify-content: center; padding: 16px; }
+  #app { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 12px; }
+  /* Emergency strip is plain HTML — renders even if all JS/backend fails. */
+  #emergency {
+    background: #fff7ed; border: 1px solid #fdba74; border-radius: 12px;
+    padding: 10px 14px; font-size: 13px;
+  }
+  #logoBar { display: flex; justify-content: center; padding: 2px 0 0; }
+  #logoBar a {
+    display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+    color: var(--deep); font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700; font-size: 22px; letter-spacing: .04em;
+  }
+  #logoBar a:hover { color: var(--accent-dark); }
+  #startCard, #chatCard { border-top: 4px solid var(--accent); }
+  #chatCard { display: flex; flex-direction: column; height: 70vh; padding: 0; overflow: hidden; }
+  #msgs { flex: 1; }
+  #composer { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--line); }
+  #leaveBtn { font-size: 13px; color: var(--muted); white-space: nowrap; }
+  #leaveBtn.confirm { border-color: var(--warn); color: var(--warn); }
+  #waitBox { text-align: center; padding: 24px 16px; }
+  #surveyFields label { font-size: 14px; }
+  #surveyFields .flabel { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  #surveyFields .req { color: var(--danger); }
+  #surveyFields .opts { display: flex; flex-direction: column; gap: 3px; }
+  #surveyFields .opts label { display: flex; gap: 8px; align-items: center; font-weight: 400; }
+  #surveyFields .opts input { width: auto; flex: none; }
+  #surveyFields .missing .flabel { color: var(--danger); }
+  .dots::after { content: '…'; animation: blink 1.4s infinite; }
+  @keyframes blink { 50% { opacity: .2; } }
+  #connState { font-size: 12px; text-align: center; padding: 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="logoBar">
+    <a class="brand"{{#website}} href="{{website}}" target="_blank" rel="noopener"{{/website}}
+       title="{{longName}}">{{shortName}}</a>
+  </div>
+  <div id="emergency">
+    <strong>In immediate danger?</strong> {{#ready.helpline}}Call <strong>{{emergency.primary.number}}</strong> ({{emergency.primary.label}}){{#emergency.secondary.number}} or
+    <strong>{{emergency.secondary.number}}</strong> ({{emergency.secondary.label}}){{/emergency.secondary.number}}. {{name}} phone: <strong>{{phone}}</strong>.{{/ready.helpline}}{{^ready.helpline}}Contact your local emergency services now.{{/ready.helpline}}
+  </div>{{^ready.helpline}}
+  <!-- Fail closed: this deployment's profile has no helpline phone or
+       emergency number, so the chat is not offered at all. -->
+  <div class="panel" id="notReady">
+    <h2 style="margin-bottom:8px">Chat is not available</h2>
+    <p class="muted">This service isn't taking chats yet. If you are in danger,
+      contact your local emergency services now.</p>
+  </div>{{/ready.helpline}}
+
+{{#features.voice}}{{#ready.helpline}}  <div class="panel" id="voiceCard" hidden data-safety="{{safetyHash}}">
+    <strong>Prefer to talk?</strong>
+    <p class="muted" style="margin:4px 0 8px">Call us from this browser — no phone credit needed.</p>
+    <button id="voiceCallBtn">📞 Call us</button>
+    <button id="voiceHangBtn" hidden>Hang up</button>
+    <p id="voiceStatus" class="muted" style="margin-top:8px" hidden></p>
+  </div>
+
+{{/ready.helpline}}{{/features.voice}}  <div class="panel" id="startCard"{{^ready.helpline}} hidden{{/ready.helpline}}{{#features.setupWizard}} data-safety="{{safetyHash}}"{{/features.setupWizard}}>
+    <h2 class="brand" style="margin-bottom:8px">Chat with {{shortName}}</h2>
+    <p class="muted" style="margin-bottom:14px">
+      You'll talk with a trained support worker. It's confidential and you can
+      stay anonymous. These questions help us support you better.
+    </p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div id="surveyFields" style="display:flex;flex-direction:column;gap:12px">
+        <p class="muted">Loading…</p>
+      </div>
+      <label>
+        This is an anonymous service, but if you would like to use a name,
+        please provide a nickname for confidentiality reasons.
+        <input id="alias" maxlength="40" placeholder="Nickname (optional)">
+      </label>
+      <button class="primary" id="startBtn" style="margin-top:2px">Start chat</button>
+      <p class="muted" id="startErr" style="color:var(--danger);display:none"></p>
+    </div>
+  </div>
+
+  <div class="panel" id="chatCard" style="display:none">
+    <div id="waitBox">
+      <h3 class="dots">Connecting you to a support worker</h3>
+      <p class="muted" id="posLine" style="margin-top:8px">You're in the queue.</p>
+      <p class="muted" style="margin-top:8px">
+        Please keep this page open — we know you're here, and someone will be with you.
+      </p>
+    </div>
+    <div class="msgs" id="msgs" style="display:none"></div>
+    <div id="connState" style="display:none"></div>
+    <div id="composer" style="display:none">
+      <input id="input" placeholder="Type a message" autocomplete="off">
+      <button class="primary" id="sendBtn">Send</button>
+      <button id="leaveBtn" title="End this chat">Leave chat</button>
+    </div>
+  </div>
+</div>
+
+<script src="caller.js"></script>{{#features.voice}}
+<script src="voicecall.js"></script>{{/features.voice}}
+</body>
+</html>

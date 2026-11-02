@@ -1,0 +1,99 @@
+{
+  "id": "generic",
+  "name": "Lifeline",
+  "shortName": "Lifeline",
+  "longName": "Lifeline",
+  "org": "the organisation",
+  "manual": "service manual",
+  "website": null,
+  "timezone": "UTC",
+  "phone": null,
+  "emergency": {
+    "primary": { "number": null, "label": "emergency services" },
+    "secondary": { "number": null, "label": "police" }
+  },
+  "mail": { "fromName": null },
+  "colors": {
+    "bg": "#f6f8fb",
+    "panel": "#ffffff",
+    "line": "#d7dee8",
+    "ink": "#1e293b",
+    "muted": "#526173",
+    "accent": "#2f5fa8",
+    "accentDark": "#254b86",
+    "accentInk": "#ffffff",
+    "deep": "#1c3456",
+    "soft": "#e3ebf6"
+  },
+  "logo": {
+    "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='#2f5fa8' d='M4 3h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-9l-5 4v-4H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z'/></svg>"
+  },
+  "text": {
+    "cssHeader": "Shared styles: a calm blue accent, white panels, slate ink, serif\n   display headings and a speech-bubble mark.",
+    "logoName": "The logo",
+    "siteLabel": "",
+    "passcodeIntro": "This site is for the team only. ",
+    "indexNotice": "",
+    "slotNoteExample": "e.g. first shift, observing",
+    "supervisionHours": ""
+  },
+  "safetyValveMessage": "We are very sorry — all of our support workers are helping other people right now. Please try again in a little while. If you are in immediate danger, {{#emergency.primary.number}}call {{emergency.primary.number}} ({{emergency.primary.label}}){{#emergency.secondary.number}} or {{emergency.secondary.number}} ({{emergency.secondary.label}}){{/emergency.secondary.number}}{{/emergency.primary.number}}{{^emergency.primary.number}}contact your local emergency services{{/emergency.primary.number}}.{{#phone}} {{name}} phone: {{phone}}.{{/phone}}",
+  "schedule": {
+    "groupPrefix": null,
+    "shifts": [
+      [1, "Day", "08:00", "16:00", "08:00", {"default": "both"}],
+      [2, "Evening", "16:00", "00:00", "16:00", {"default": "both"}],
+      [3, "Night", "00:00", "08:00", "00:00", {"default": "both"}]
+    ],
+    "supervision": [],
+    "weekSeats": {}
+  },
+  "import": { "tellWorkbook": false },
+  "forms": {
+    "regionField": { "id": "region", "type": "text", "label": "Where are you? (town, city or region)" },
+    "nationalityOptions": [
+      { "id": "local", "label": "Local" },
+      { "id": "n_america", "label": "N. America" },
+      { "id": "uk", "label": "UK" },
+      { "id": "australia_nz", "label": "Australia, NZ" },
+      { "id": "europe", "label": "Europe" },
+      { "id": "indian_subcontinent", "label": "Indian Subcontinent" },
+      { "id": "africa", "label": "Africa" },
+      { "id": "s_america", "label": "S. America" },
+      { "id": "asia", "label": "Asia" },
+      { "id": "middle_east", "label": "Middle East" },
+      { "id": "other", "label": "Other" }
+    ]
+  },
+  "canned": {
+    "starter": [
+      [
+        "Welcome",
+        "Hi, thank you for reaching out. I'm here to listen. How are you feeling right now?"
+      ],
+      ["Still here", "I'm still here with you. Take whatever time you need."],
+      [
+        "Safety check",
+        "I want to make sure you are safe right now. Are you somewhere safe at the moment?"
+      ],
+      [
+        "Slow reply",
+        "Sorry to keep you waiting — I'm still with you, just taking a moment to reply properly."
+      ],
+      [
+        "Closing",
+        "Thank you for talking with me today. Please remember you can reach us again any time. Take care of yourself."
+      ],
+      [
+        "Emergency",
+        "If you are in immediate danger, please call your local emergency number right now. Would you like to talk through what is happening?"
+      ],
+      ["Qualifications", "I have been trained as a support worker."],
+      ["Supervision", "I am working under professional supervision."]
+    ]
+  },
+  "seed": { "boardTopics": [["Team notebook", 0], ["Coordinator notes", 0], ["Protocols & Key Numbers", 1]], "resources": [] },
+  "features": { "orgEditor": true, "shiftEditor": true, "setupWizard": true, "voice": true },
+  "legacy": { "system": null, "board": null },
+  "prototype": false
+}

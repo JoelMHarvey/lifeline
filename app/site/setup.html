@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} — First-run setup</title>
+<link rel="stylesheet" href="shared.css">{{#features.setupWizard}}
+<script>location.replace('wizard.html');</script>{{/features.setupWizard}}
+<style>body { display:flex; align-items:center; justify-content:center; height:100vh; }</style>
+</head>
+<body>
+<div class="panel" style="width:380px">
+  <h2 class="brand" style="margin-bottom:8px">First-run setup</h2>
+  <p class="muted" style="margin-bottom:14px">Create the coordinator account.
+    This only works while no accounts exist.</p>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <label>Your name <input id="name"></label>
+    <label>Email <input id="email" type="email"></label>
+    <label>Password <span class="muted">(10+ characters)</span>
+      <input id="pw" type="password" autocomplete="new-password"></label>
+    <button class="primary" id="go">Create coordinator</button>
+    <p class="muted" id="err" style="color:var(--danger)"></p>
+  </div>
+</div>
+<script>
+let setupToken = '';
+document.getElementById('go').onclick = async () => {
+  const send = () => fetch('/api/setup', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: document.getElementById('name').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('pw').value,
+      setupToken,
+    }),
+  });
+  let res = await send();
+  if (res.status === 401) {
+    // A production server asks for its setup token (TL_SETUP_TOKEN, or the
+    // one it printed to its log on first boot).
+    setupToken = (prompt('Setup token (from TL_SETUP_TOKEN or the server log):') || '').trim();
+    if (setupToken) res = await send();
+  }
+  const data = await res.json().catch(() => ({}));
+  if (res.ok) location.href = 'console.html';
+  else document.getElementById('err').textContent = data.error || 'Setup failed.';
+};
+</script>
+</body>
+</html>

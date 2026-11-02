@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} — My profile</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 680px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 10px; }
+  .panel { margin-top: 14px; }
+  .panel h3 { margin-bottom: 10px; }
+  label { display: block; margin-bottom: 10px; font-size: 14px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  @media (max-width: 560px) { .row2 { grid-template-columns: 1fr; } }
+  #photoWrap { display: flex; gap: 16px; align-items: center; margin-bottom: 14px; }
+  #photoPreview {
+    width: 88px; height: 88px; border-radius: 50%; object-fit: cover;
+    border: 3px solid var(--accent); background: var(--soft); flex: none;
+  }
+  #photoPreview.empty { display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 30px; font-family: Georgia, serif; }
+  #record { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; margin: 0; }
+  #record dt { font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted); margin-top: 8px; }
+  #record dd { margin: 0; font-size: 14px; }
+  #totpSecret { font-family: monospace; background: var(--soft); padding: 8px 12px;
+    border-radius: 8px; word-break: break-all; }
+  #statsTbl td, #skillsTbl td { padding: 5px 8px 5px 0; border-top: 1px solid var(--line); }
+  #skillsTbl button { font-size: 12px; padding: 2px 8px; }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">My profile</h1>
+
+<div class="panel">
+  <h3>Details</h3>
+  <div id="photoWrap">
+    <div id="photoPreview" class="empty">☺</div>
+    <div>
+      <input type="file" id="photoFile" accept="image/*" style="display:none">
+      <button id="photoPick">Choose photo</button>
+      <button id="photoClear" style="margin-left:6px">Remove</button>
+      <p class="muted" style="margin-top:6px">Shown to colleagues only — never to callers.</p>
+    </div>
+  </div>
+  <div class="row2">
+    <label>Display name <span class="muted">(your code name — the only name callers see)</span>
+      <input id="displayName" maxlength="60"></label>
+    <label>Title <span class="muted">(e.g. Support Worker)</span>
+      <input id="title" maxlength="60"></label>
+    <label>Gender
+      <select id="gender">
+        <option value="">Unspecified</option>
+        <option>Female</option><option>Male</option><option>Nonbinary</option>
+        <option>Prefer to self-describe</option><option>Prefer not to answer</option>
+      </select></label>
+    <label>Pronouns <span class="muted">(e.g. she/her)</span>
+      <input id="pronouns" maxlength="40"></label>
+    <label>Birthday
+      <input id="birthday" type="date"></label>
+    <label>Preferred language
+      <select id="preferredLanguage">
+        <option value="">—</option>
+        <option>English</option><option>日本語</option><option>Other</option>
+      </select></label>
+    <label>Languages spoken <span class="muted">(comma-separated)</span>
+      <input id="languages" maxlength="120"></label>
+    <label>Phone <span class="muted">(for on-call display)</span>
+      <input id="phone" maxlength="40"></label>
+  </div>
+  <label>Background <span class="muted">(interests, education, favorite books, fun quotes etc.)</span>
+    <textarea id="background" rows="3" maxlength="2000"></textarea></label>
+  <label style="display:flex;gap:8px;align-items:center">
+    <input type="checkbox" id="privacy" style="width:auto">
+    Profile privacy — hide my details from other volunteers</label>
+  <button class="primary" id="saveProfile">Save</button>
+  <span class="muted" id="profileMsg"></span>
+</div>
+
+<div class="panel">
+  <h3>Service record <span class="muted">(managed by coordinators)</span></h3>
+  <dl id="record">
+    <div><dt>Email</dt><dd id="rEmail"></dd></div>
+    <div><dt>Security level</dt><dd id="rRole"></dd></div>
+    <div><dt>Current status</dt><dd id="rStatus"></dd></div>
+    <div><dt>Supervisor</dt><dd id="rSupervisor"></dd></div>
+    <div><dt>Date started</dt><dd id="rStarted"></dd></div>
+    <div id="rEndWrap" style="display:none"><dt>End of service</dt><dd id="rEnd"></dd></div>
+  </dl>
+</div>
+
+<div class="panel">
+  <h3>Shift statistics</h3>
+  <table id="statsTbl" style="width:100%;border-collapse:collapse;font-size:14px">
+    <tr style="text-align:left;color:var(--muted);font-size:12px;text-transform:uppercase">
+      <th style="padding:4px 8px 4px 0"></th><th>Scheduled</th><th>Worked</th>
+      <th>Scheduled hours</th><th>Worked hours</th></tr>
+  </table>
+  <p class="muted" id="firstShift" style="margin-top:8px"></p>
+</div>
+
+<div class="panel">
+  <h3>Email notifications</h3>
+  <p class="muted" style="margin-bottom:10px">
+    The team's Google Chat space gets everything as usual — tick what you'd
+    also like sent to your own email (<span id="prefEmail"></span>).</p>
+  <div id="prefList" style="display:flex;flex-direction:column;gap:6px"></div>
+  <button class="primary" id="savePrefs" style="margin-top:10px">Save notification settings</button>
+  <span class="muted" id="prefsMsg"></span>
+</div>
+
+<div class="panel">
+  <h3>Skills &amp; achievements</h3>
+  <p class="muted" style="margin-bottom:10px">Training milestones and certifications —
+    e.g. QPR Gatekeeper Training, shift observations.</p>
+  <table id="skillsTbl" style="width:100%;border-collapse:collapse;font-size:14px">
+    <tr style="text-align:left;color:var(--muted);font-size:12px;text-transform:uppercase">
+      <th style="padding:4px 8px 4px 0">Category</th><th>Title</th><th>Due on</th>
+      <th>Status</th><th>Changed</th><th>Notes</th><th></th></tr>
+  </table>
+  <p class="muted" id="skillsEmpty" style="display:none">Nothing recorded yet.</p>
+  <div style="display:grid;grid-template-columns:1fr 1.4fr .9fr .9fr;gap:8px;margin-top:12px">
+    <input id="skCategory" placeholder="Category (e.g. Training)" maxlength="60">
+    <input id="skTitle" placeholder="Title" maxlength="120">
+    <input id="skDue" type="date" title="Due on">
+    <select id="skStatus">
+      <option value="to_be_done">To be done</option>
+      <option value="in_progress">In progress</option>
+      <option value="completed">Completed</option>
+    </select>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <input id="skNotes" placeholder="Notes (optional)" maxlength="500" style="flex:1">
+    <button class="primary" id="skAdd">Add</button>
+  </div>
+  <span class="muted" id="skMsg"></span>
+</div>
+
+<div class="panel">
+  <h3>Change password</h3>
+  <label>Current password <input id="curPw" type="password" autocomplete="current-password"></label>
+  <label>New password <span class="muted">(10+ characters)</span>
+    <input id="newPw" type="password" autocomplete="new-password"></label>
+  <button class="primary" id="savePw">Change password</button>
+  <span class="muted" id="pwMsg"></span>
+</div>
+
+<div class="panel">
+  <h3>Two-factor authentication (TOTP)</h3>
+  <p class="muted" id="totpState"></p>
+  <div id="totpSetup" style="display:none">
+    <p style="margin:8px 0">Scan this with your authenticator app
+      (Google Authenticator, 1Password, Authy…):</p>
+    <img id="totpQr" alt="QR code for your authenticator app"
+      style="display:none;width:220px;height:220px;border:1px solid var(--line);border-radius:8px">
+    <p class="muted" style="margin:8px 0">Or enter the secret by hand:</p>
+    <p id="totpSecret"></p>
+    <p class="muted" style="margin:8px 0">Or paste this otpauth URL into an app that accepts it:</p>
+    <p id="totpUrl" style="font-size:12px;word-break:break-all"></p>
+    <label style="margin-top:10px">Enter a code to confirm
+      <input id="totpCode" inputmode="numeric" placeholder="6-digit code"></label>
+    <button class="primary" id="totpConfirm">Confirm &amp; enable</button>
+    <span class="muted" id="totpMsg"></span>
+  </div>
+  <button id="totpStart" style="margin-top:6px">Set up authenticator</button>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const post = (url, body) => fetch(url, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body || {}),
+});
+
+let photoData;   // undefined = untouched, '' = cleared, 'data:…' = new photo
+
+function showPhoto(src) {
+  const p = $('photoPreview');
+  if (src) {
+    const img = document.createElement('img');
+    img.id = 'photoPreview';
+    img.src = src;
+    p.replaceWith(img);
+  } else if (p.tagName === 'IMG') {
+    const div = document.createElement('div');
+    div.id = 'photoPreview'; div.className = 'empty'; div.textContent = '☺';
+    p.replaceWith(div);
+  }
+}
+
+(async () => {
+  const res = await fetch('/api/me');
+  if (!res.ok) { location.href = 'console.html'; return; }
+  const me = await res.json();
+  for (const k of ['displayName', 'title', 'gender', 'pronouns', 'birthday',
+    'preferredLanguage', 'languages', 'phone', 'background']) {
+    $(k).value = me[k] || '';
+  }
+  $('privacy').checked = !!me.privacy;
+  showPhoto(me.photo);
+  $('rEmail').textContent = me.email || '—';
+  $('rRole').textContent = me.role;
+  $('rStatus').textContent = (me.serviceStatus || '').replace('_', ' ') || '—';
+  $('rSupervisor').textContent = me.supervisorName || '—';
+  $('rStarted').textContent = me.dateStarted || '—';
+  if (me.endOfService) {
+    $('rEndWrap').style.display = 'block';
+    $('rEnd').textContent = me.endOfService;
+  }
+  $('totpState').textContent = me.totpEnabled
+    ? 'Enabled — codes are required at login.'
+    : 'Not enabled yet. Strongly recommended: your account can reach caller records.';
+  if (me.totpEnabled) $('totpStart').textContent = 'Re-enrol authenticator';
+  $('prefEmail').textContent = me.email || 'your account email';
+  loadStats();
+  loadPrefs(me);
+  loadSkills();
+})();
+
+// --- Shift statistics ------------------------------------------------------
+async function loadStats() {
+  const s = await (await fetch('/api/schedule/my-stats')).json().catch(() => null);
+  if (!s) return;
+  const rows = [['All past shifts', s.allPast], ['Last 12 months', s.last12mo],
+    ['This month', s.thisMonth], ['Next month', s.nextMonth]];
+  for (const [label, p] of rows) {
+    const tr = document.createElement('tr');
+    for (const v of [label, p.scheduled, p.worked, p.scheduledHours, p.workedHours]) {
+      const td = document.createElement('td');
+      td.textContent = v;
+      tr.appendChild(td);
+    }
+    $('statsTbl').appendChild(tr);
+  }
+  $('firstShift').textContent = 'First shift: ' + (s.firstShift || 'none yet');
+}
+
+// --- Email notification preferences ---------------------------------------
+let prefState = {};
+async function loadPrefs(me) {
+  prefState = (me.notifyPrefs && me.notifyPrefs.email) || {};
+  const kinds = await (await fetch('/api/notify-kinds')).json().catch(() => []);
+  for (const { kind, label } of kinds) {
+    const l = document.createElement('label');
+    l.style.cssText = 'display:flex;gap:8px;align-items:center;margin:0;font-size:14px';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.style.width = 'auto'; cb.dataset.kind = kind;
+    cb.checked = !!prefState[kind];
+    l.appendChild(cb);
+    l.appendChild(document.createTextNode(label));
+    $('prefList').appendChild(l);
+  }
+}
+$('savePrefs').onclick = async () => {
+  const email = {};
+  for (const cb of document.querySelectorAll('#prefList input')) {
+    if (cb.checked) email[cb.dataset.kind] = true;
+  }
+  const res = await post('/api/profile', { notifyPrefs: { email } });
+  $('prefsMsg').textContent = res.ok ? 'saved' : 'failed';
+};
+
+// --- Skills & achievements -------------------------------------------------
+const SK_LABEL = { to_be_done: 'To be done', in_progress: 'In progress', completed: 'Completed' };
+async function loadSkills() {
+  const rows = await (await fetch('/api/skills')).json().catch(() => []);
+  for (const tr of [...$('skillsTbl').querySelectorAll('tr')].slice(1)) tr.remove();
+  $('skillsEmpty').style.display = rows.length ? 'none' : 'block';
+  for (const s of rows) {
+    const tr = document.createElement('tr');
+    for (const v of [s.category, s.title, s.dueOn || '—', null, s.statusChanged || '—', s.notes || '']) {
+      const td = document.createElement('td');
+      if (v === null) { // status cell: editable in place
+        const sel = document.createElement('select');
+        for (const [val, label] of Object.entries(SK_LABEL)) {
+          sel.appendChild(new Option(label, val, false, val === s.status));
+        }
+        sel.onchange = async () => {
+          await fetch('/api/skills/' + s.id, {
+            method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: sel.value }),
+          });
+          loadSkills();
+        };
+        td.appendChild(sel);
+      } else {
+        td.textContent = v;
+      }
+      tr.appendChild(td);
+    }
+    const td = document.createElement('td');
+    const del = document.createElement('button');
+    del.textContent = 'Delete';
+    del.onclick = async () => {
+      if (!confirm(`Delete "${s.title}"?`)) return;
+      await fetch('/api/skills/' + s.id, { method: 'DELETE' });
+      loadSkills();
+    };
+    td.appendChild(del);
+    tr.appendChild(td);
+    $('skillsTbl').appendChild(tr);
+  }
+}
+$('skAdd').onclick = async () => {
+  const res = await post('/api/skills', {
+    category: $('skCategory').value.trim(), title: $('skTitle').value.trim(),
+    dueOn: $('skDue').value || undefined, status: $('skStatus').value,
+    notes: $('skNotes').value.trim() || undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) { $('skMsg').textContent = data.error || 'failed'; return; }
+  $('skMsg').textContent = '';
+  $('skCategory').value = ''; $('skTitle').value = ''; $('skDue').value = ''; $('skNotes').value = '';
+  loadSkills();
+};
+
+// Resize the chosen image in the browser to a small square JPEG, so what we
+// store is always tiny regardless of the original.
+$('photoPick').onclick = () => $('photoFile').click();
+$('photoFile').onchange = () => {
+  const f = $('photoFile').files[0];
+  if (!f) return;
+  const img = new Image();
+  img.onload = () => {
+    const S = 192;
+    const c = document.createElement('canvas');
+    c.width = S; c.height = S;
+    const side = Math.min(img.width, img.height);
+    c.getContext('2d').drawImage(img,
+      (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, S, S);
+    photoData = c.toDataURL('image/jpeg', 0.85);
+    showPhoto(photoData);
+    URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(f);
+};
+$('photoClear').onclick = () => { photoData = ''; showPhoto(''); };
+
+$('saveProfile').onclick = async () => {
+  const body = {
+    displayName: $('displayName').value, title: $('title').value,
+    gender: $('gender').value, pronouns: $('pronouns').value,
+    birthday: $('birthday').value, preferredLanguage: $('preferredLanguage').value,
+    languages: $('languages').value, phone: $('phone').value,
+    background: $('background').value, privacy: $('privacy').checked,
+  };
+  if (photoData !== undefined) body.photo = photoData;
+  const res = await post('/api/profile', body);
+  const data = await res.json().catch(() => ({}));
+  $('profileMsg').textContent = res.ok ? 'saved' : (data.error || 'failed');
+};
+
+$('savePw').onclick = async () => {
+  const res = await post('/api/password', { current: $('curPw').value, next: $('newPw').value });
+  const data = await res.json().catch(() => ({}));
+  $('pwMsg').textContent = res.ok ? 'changed — other sessions signed out' : (data.error || 'failed');
+};
+
+$('totpStart').onclick = async () => {
+  const data = await (await post('/api/totp/start')).json();
+  if (data.qr) {
+    $('totpQr').src = data.qr;
+    $('totpQr').style.display = 'block';
+  }
+  $('totpSecret').textContent = data.secret.replace(/(.{4})/g, '$1 ').trim();
+  $('totpUrl').textContent = data.otpauth;
+  $('totpSetup').style.display = 'block';
+};
+
+$('totpConfirm').onclick = async () => {
+  const res = await post('/api/totp/confirm', { code: $('totpCode').value });
+  const data = await res.json().catch(() => ({}));
+  if (res.ok) {
+    $('totpMsg').textContent = 'enabled ✓';
+    $('totpState').textContent = 'Enabled — codes are required at login.';
+  } else {
+    $('totpMsg').textContent = data.error || 'failed';
+  }
+};
+</script>
+</body>
+</html>

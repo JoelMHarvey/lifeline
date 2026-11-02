@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Schedule changes</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 14px 0; }
+  .row input, .row select { width: auto; }
+  #q { flex: 1; min-width: 220px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted); background: var(--soft); }
+  td, th { padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.when { white-space: nowrap; color: var(--muted); font-variant-numeric: tabular-nums; }
+  td.slot { white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  #more { margin-top: 12px; }
+  #count { font-size: 13px; }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">Schedule changes</h1>
+<p class="muted">Every change to the schedule, newest first: who did it, what, and when.
+  Times are shown in your own time zone.</p>
+
+<div class="row">
+  <input id="q" type="search" placeholder="Search names, dates, notes…">
+  <select id="who"><option value="">Everyone</option></select>
+  <select id="what"><option value="">All changes</option></select>
+  <button id="csvBtn">Download CSV</button>
+  <span id="count" class="muted"></span>
+</div>
+
+<table>
+  <thead><tr><th>When</th><th>Who</th><th>What</th><th>Slot</th><th>Detail</th></tr></thead>
+  <tbody id="rows"><tr><td colspan="5" class="muted">Loading…</td></tr></tbody>
+</table>
+<button id="more" style="display:none">Load older changes</button>
+
+<script src="changes.js"></script>
+</body>
+</html>

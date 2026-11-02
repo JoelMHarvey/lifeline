@@ -1,0 +1,176 @@
+/* {{text.cssHeader}} Deliberately no webfont downloads: a crisis chat page
+   must never wait on a font CDN, so headings use the system serif stack
+   (Georgia everywhere) and body text the system sans stack. */
+
+* { box-sizing: border-box; margin: 0; }
+:root {
+  --bg: {{colors.bg}}; --panel: {{colors.panel}}; --line: {{colors.line}}; --ink: {{colors.ink}};
+  --muted: {{colors.muted}}; --accent: {{colors.accent}}; --accent-dark: {{colors.accentDark}};
+  --accent-ink: {{colors.accentInk}}; --deep: {{colors.deep}};
+  --ok: #15803d; --warn: #b45309; --danger: #d7282f; --soft: {{colors.soft}};
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Hiragino Sans", sans-serif;
+  background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.5;
+}
+h1, h2 { font-family: Georgia, "Times New Roman", "Hiragino Mincho ProN", serif; }
+
+/* {{text.logoName}}, drawn inline so it works offline. */
+.brand { display: flex; align-items: center; gap: 9px; }
+.brand::before {
+  content: ''; width: 0.85em; height: 0.85em; flex: none;
+  background-image: url("{{logo.cssUrl}}");
+  background-size: contain; background-repeat: no-repeat;
+}
+
+/* Shared side menu (nav.js) — the same navigation on every page: a fixed
+   column down the left, pushing page content right; a bar across the top on
+   phone-width screens; hidden when printing. */
+:root { --sidenav-w: 176px; }
+.sidenav {
+  position: fixed; top: 0; bottom: 0; left: 0; z-index: 50;
+  width: var(--sidenav-w);
+  display: flex; flex-direction: column; gap: 14px;
+  background: var(--panel);
+  border-right: 3px solid var(--accent);
+  padding: 16px 12px; overflow-y: auto;
+  box-shadow: 1px 0 3px rgba({{colors.deepRgb}}, .06);
+}
+html.has-sidenav body { margin-left: var(--sidenav-w) !important; }
+.sidenav .navlinks { display: flex; flex-direction: column; gap: 2px; }
+.sidenav a { color: var(--muted); font-size: 14px; text-decoration: none;
+  padding: 5px 8px; border-radius: 6px; }
+.sidenav a:hover { background: var(--soft); color: var(--ink); }
+.sidenav a.current { color: var(--accent-dark); font-weight: 700; background: var(--soft); }
+.sidenav a.brand {
+  color: var(--ink); font-weight: 700; font-size: 16px; padding: 0 8px;
+  font-family: Georgia, "Times New Roman", "Hiragino Mincho ProN", serif;
+}
+.sidenav a.brand:hover { background: none; }
+.sidenav .navfoot { margin-top: auto; display: flex; flex-direction: column;
+  gap: 6px; align-items: flex-start; }
+.sidenav .navfoot .badge { white-space: normal; }
+.sidenav .reportBtn { font-size: 13px; padding: 5px 10px; width: 100%; text-align: left; }
+
+/* The "Report a problem" form (nav.js). */
+.reportDlg { margin: auto; width: min(560px, calc(100vw - 32px)); border: 1px solid var(--line);
+  border-radius: 12px; padding: 18px 20px; box-shadow: 0 12px 40px rgba(0,0,0,.2); }
+.reportDlg::backdrop { background: rgba({{colors.deepRgb}}, .25); }
+.reportDlg h2 { font-size: 17px; margin-bottom: 2px; }
+.reportDlg > form > .muted { font-size: 13px; margin-bottom: 12px; }
+.reportDlg label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.reportDlg label input, .reportDlg label select, .reportDlg label textarea {
+  display: block; width: 100%; margin-top: 3px; font: inherit; color: var(--ink); }
+.reportDlg .rRow { display: flex; gap: 12px; flex-wrap: wrap; }
+.reportDlg .rRow label { flex: 1; min-width: 180px; }
+.reportDlg .rPage { font-size: 12px; }
+.reportDlg .rErr { color: var(--danger); font-size: 13px; }
+.reportDlg .rErr:empty { display: none; }
+.reportDlg .rFoot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.reportDlg .rDone p { margin: 8px 0; }
+
+/* Phones and narrow windows: a slim bar across the top (brand + Menu),
+   the links opening below it as a two-column grid of big tap targets. */
+.sidenav .navToggle { display: none; }
+@media (max-width: 760px) {
+  .sidenav { position: sticky; top: 0; width: auto; flex-direction: row; flex-wrap: wrap;
+    align-items: center; justify-content: space-between; border-right: none;
+    border-bottom: 3px solid var(--accent); padding: 8px 12px; gap: 8px; overflow: visible; }
+  .sidenav .navToggle { display: inline-block; font-size: 15px; padding: 6px 12px; }
+  .sidenav .navlinks, .sidenav .navfoot { display: none; width: 100%; }
+  .sidenav.open .navlinks { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .sidenav.open .navfoot { display: flex; flex-direction: row; flex-wrap: wrap;
+    align-items: center; gap: 8px; margin-top: 0; padding-top: 8px;
+    border-top: 1px solid var(--line); }
+  .sidenav a { font-size: 16px; padding: 10px 12px; }
+  .sidenav a.brand { font-size: 17px; padding: 0; }
+  .sidenav .reportBtn { width: auto; font-size: 15px; }
+  html.has-sidenav body { margin-left: 0 !important; }
+  /* Pages pad their content; the menu bar runs edge to edge above it. The
+     console (body.bleed) manages its own edges. */
+  html.has-sidenav body:not(.bleed) { padding: 0 12px 20px !important; max-width: none !important; }
+  html.has-sidenav body:not(.bleed) > .sidenav { margin: 0 -12px 12px; }
+  /* iOS zooms into any field under 16px when it's tapped. */
+  input, select, textarea { font-size: 16px; }
+  /* Wide tables scroll sideways on their own, not the whole page. */
+  table { display: block; max-width: 100%; overflow-x: auto; }
+}
+@media print {
+  .sidenav { display: none !important; }
+  html.has-sidenav body { margin-left: 0 !important; }
+}
+
+button {
+  font: inherit; border: 1px solid var(--line); background: var(--panel);
+  border-radius: 6px; padding: 7px 14px; cursor: pointer; color: var(--ink);
+  transition: background .12s, border-color .12s;
+}
+button:hover { border-color: var(--accent); }
+button.primary {
+  background: var(--accent); color: var(--accent-ink);
+  border-color: var(--accent); font-weight: 600;
+}
+button.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+button.danger { background: var(--danger); color: #fff; border-color: var(--danger); font-weight: 600; }
+button:disabled { opacity: .5; cursor: default; }
+input, select, textarea {
+  font: inherit; border: 1px solid var(--line); border-radius: 6px;
+  padding: 7px 10px; width: 100%; background: #fff; color: var(--ink);
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--soft); border-color: var(--accent);
+}
+textarea { resize: vertical; }
+a { color: var(--accent-dark); }
+.panel {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 16px; box-shadow: 0 1px 3px rgba({{colors.deepRgb}}, .05);
+}
+.muted { color: var(--muted); font-size: 13px; }
+.badge {
+  display: inline-block; border-radius: 999px; padding: 2px 10px;
+  font-size: 12px; font-weight: 600; background: var(--soft); color: var(--accent-dark);
+}
+.badge.ok { background: #dcfce7; color: var(--ok); }
+.badge.warn { background: #fef3c7; color: var(--warn); }
+.badge.danger { background: #fee2e2; color: var(--danger); }
+
+/* chat bubbles */
+.msgs { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding: 12px; }
+.msg { max-width: 82%; padding: 8px 12px; border-radius: 14px; white-space: pre-wrap; word-break: break-word; }
+.msg.caller { align-self: flex-start; background: var(--soft); border-bottom-left-radius: 4px; }
+.msg.worker { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+.msg.system { align-self: center; background: transparent; color: var(--muted); font-size: 13px; }
+.msg .meta { font-size: 11px; opacity: .7; margin-top: 2px; }
+.pending { opacity: .55; }
+
+/* Problem report cards (issuecard.js): Ops page and My problem reports. */
+.issue { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  margin-bottom: 8px; }
+.issue > summary { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline;
+  padding: 9px 12px; cursor: pointer; }
+.issue .iRef { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent-dark); }
+.issue .iTitle { flex: 1; min-width: 200px; font-weight: 600; }
+.issue .iStatus { font-size: 12px; border-radius: 999px; padding: 1px 9px;
+  background: var(--soft); color: var(--accent-dark); white-space: nowrap; }
+.issue.s-new .iStatus { background: #fee2e2; color: #991b1b; }
+.issue.s-in_progress .iStatus { background: #fef3c7; color: #92400e; }
+.issue.s-fixed .iStatus { background: #dcfce7; color: #166534; }
+.issue.s-wont_fix .iStatus, .issue.s-done .iStatus { background: #eef2f2; color: var(--muted); }
+.issue .iMeta { width: 100%; font-size: 12px; }
+.issue .iBody { padding: 0 12px 12px; border-top: 1px solid var(--line); }
+.issue .iText { white-space: pre-wrap; margin: 10px 0 6px; font-size: 14px; }
+.issue .iWhere { font-size: 12px; word-break: break-word; }
+.issue .iThread { list-style: none; padding: 0; margin: 10px 0; border-left: 2px solid var(--line); }
+.issue .iThread li { padding: 4px 0 6px 10px; font-size: 13px; }
+.issue .iThread li div { white-space: pre-wrap; margin-top: 2px; }
+.issue .iForm { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.issue .iForm textarea { width: 100%; font: inherit; font-size: 14px; }
+.issue .iForm select { width: auto; align-self: flex-start; }
+.issue .iHint { font-size: 12px; }
+.issue .iBtns { display: flex; gap: 8px; flex-wrap: wrap; }
+.issue .iManage { margin-top: 10px; font-size: 13px; }
+.issue .iManage a { color: var(--accent-dark); font-weight: 600; }
+.issue .iErr { color: var(--danger); font-size: 13px; }
+.issue .iErr:empty { display: none; }

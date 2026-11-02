@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Console</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { height: 100vh; display: flex; flex-direction: column; }
+  header {
+    display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+    background: var(--panel); border-bottom: 3px solid var(--accent); flex-wrap: wrap;
+  }
+  header h1 { font-size: 18px; }
+  #onCallChip { background:#fef3c7; border:1px solid #f59e0b; border-radius:999px;
+    padding:3px 12px; font-size:13px; display:none; }
+  #statusSeg { display: flex; gap: 0; margin-left: auto; }
+  #statusSeg button { border-radius: 0; border-right-width: 0; }
+  #statusSeg button:first-child { border-radius: 8px 0 0 8px; }
+  #statusSeg button:last-child { border-radius: 0 8px 8px 0; border-right-width: 1px; }
+  #statusSeg button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  header a { color: var(--muted); font-size: 13px; text-decoration: none; }
+  header a:hover { text-decoration: underline; }
+
+  main { flex: 1; display: grid;
+    grid-template-columns: 260px 1fr 8px var(--recordW, 400px);
+    gap: 6px; padding: 12px; min-height: 0; }
+  .col { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  #recordResize { cursor: col-resize; border-radius: 4px; position: relative; }
+  #recordResize::after { content: ''; position: absolute; inset: 0 2px;
+    background: var(--line); border-radius: 4px; }
+  #recordResize:hover::after, #recordResize.dragging::after { background: var(--accent); }
+  .panel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 10px; }
+
+  .queueItem { border: 1px solid var(--line); border-radius: 10px; padding: 10px; margin-bottom: 8px; }
+  .queueItem .wait { font-variant-numeric: tabular-nums; }
+  .queueItem.paged { border-color: #fdba74; background: #fff7ed; }
+
+  #chatPanel { flex: 1; display: flex; flex-direction: column; padding: 0; min-height: 0; }
+  #chatHead { padding: 10px 14px; border-bottom: 1px solid var(--line); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  #msgs { flex: 1; }
+  #composerWrap { border-top: 1px solid var(--line); padding: 10px; position: relative; }
+  #composer { display: flex; gap: 8px; }
+  #cannedPop {
+    position: absolute; bottom: 100%; left: 10px; right: 10px; max-height: 220px;
+    overflow-y: auto; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12); display: none;
+  }
+  #cannedPop .item { padding: 8px 12px; cursor: pointer; }
+  #cannedPop .item:hover, #cannedPop .item.sel { background: var(--soft); }
+  #cannedPop .item .muted { font-size: 12px; }
+  #cannedPop .item.manage { border-top: 1px solid var(--line); cursor: default; }
+  #cannedPop .item.manage:hover { background: none; }
+
+  #recordCol .panel { overflow-y: auto; }
+  .directive { border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; font-size: 14px;
+    border: 1px solid; }
+  .directive.info { background: #eff6ff; border-color: #93c5fd; }
+  .directive.caution { background: #fef3c7; border-color: #f59e0b; }
+  .directive.alert { background: #fee2e2; border-color: #ef4444; }
+  .directive .lvl { font-weight: 700; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .05em; }
+  form.intake { display: flex; flex-direction: column; gap: 10px; }
+  form.intake fieldset { border: none; display: flex; flex-direction: column; gap: 4px; }
+  form.intake legend, form.intake .flabel { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+  form.intake .req { color: var(--danger); }
+  form.intake .sectionTitle { font-size: 12px; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--muted); border-top: 1px solid var(--line);
+    padding-top: 10px; margin-top: 4px; }
+  /* Option lists flow into as many columns as the (resizable) panel allows;
+     labels wrap under themselves instead of shattering across columns. */
+  .checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 3px 10px; font-size: 14px; }
+  .checks label { display: flex; gap: 6px; align-items: flex-start;
+    font-weight: 400; text-align: left; }
+  /* shared.css widens inputs to 100% for text fields — undo for ticks */
+  .checks input { margin-top: 3px; flex: none; width: auto; }
+  #saveState { font-size: 12px; }
+  #refSelected span.badge { margin: 2px 4px 2px 0; display: inline-block; }
+  #refResults { max-height: 140px; overflow-y: auto; border: 1px solid var(--line);
+    border-radius: 8px; margin-top: 4px; display: none; }
+  #refResults .item { padding: 6px 10px; cursor: pointer; font-size: 14px; }
+  #refResults .item:hover { background: var(--soft); }
+  #fuList div { border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px;
+    margin-bottom: 6px; font-size: 13px; }
+  #fuList div.overdue { border-color: #ef4444; background: #fee2e2; }
+  #feedbackBox { display: none; background: #ecfdf5; border: 1px solid #10b981;
+    border-radius: 10px; padding: 10px; margin-bottom: 10px; font-size: 14px; }
+
+  #loginOverlay {
+    position: fixed; inset: 0; background: var(--bg); display: flex;
+    align-items: center; justify-content: center; z-index: 100; /* above the side menu */
+  }
+  #pageBanner {
+    display: none; background: #b91c1c; color: #fff; padding: 10px 16px;
+    text-align: center; cursor: pointer; font-weight: 600;
+  }
+  /* Intake save state beside the heading: grey while saving, green once
+     stored, red when a save failed (it retries on its own). */
+  #saveState { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 1px 8px;
+    margin-left: 6px; text-transform: none; letter-spacing: 0; }
+  #saveState:empty { display: none; }
+  #saveState.saving { background: var(--soft); color: var(--muted); }
+  #saveState.saved { background: #dcfce7; color: #166534; }
+  #saveState.failed { background: #fee2e2; color: #991b1b; }
+  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #166534; color: #fff; padding: 10px 18px; border-radius: 10px;
+    font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.18); z-index: 90;
+    display: none; max-width: calc(100vw - 32px); text-align: center; }
+  #toast.bad { background: #991b1b; }
+  #mobileTabs { display: none; }
+  @media (max-width: 760px) {
+    body { height: 100dvh; }
+    header { padding: 8px 12px; gap: 8px; }
+    header h1 { font-size: 17px; }
+    #statusSeg { margin-left: 0; width: 100%; }
+    #statusSeg button { flex: 1; padding: 8px 4px; font-size: 14px; }
+    #mobileTabs { display: flex; background: var(--panel); border-bottom: 1px solid var(--line); }
+    #mobileTabs button { flex: 1; border: none; border-radius: 0; background: none;
+      padding: 10px 4px; font-size: 14px; font-weight: 600; color: var(--muted);
+      border-bottom: 3px solid transparent; }
+    #mobileTabs button.on { color: var(--accent-dark); border-bottom-color: var(--accent); }
+    .tabN:empty { display: none; }
+    .tabN { background: var(--danger); color: #fff; border-radius: 999px; padding: 0 7px;
+      font-size: 12px; margin-left: 2px; }
+    main { display: block; padding: 8px; overflow-y: auto; }
+    main > .col, #recordResize { display: none; }
+    main[data-tab="queue"] #queueCol,
+    main[data-tab="chat"] #chatCol,
+    main[data-tab="record"] #recordCol { display: flex; }
+    main[data-tab="chat"] { display: flex; flex-direction: column; overflow: hidden; }
+    main[data-tab="chat"] #chatCol { flex: 1; }
+    #chatPanel { min-height: 0; }
+    #composer { gap: 6px; }
+    #composer button { padding: 8px 10px; }
+    #loginOverlay .panel { width: calc(100vw - 32px) !important; }
+    #toast { bottom: 12px; }
+  }
+  #observeBanner { display:none; background:#1d4ed8; color:#fff; padding:8px 16px;
+    text-align:center; font-size:14px; }
+</style>
+</head>
+<body class="bleed">
+<script src="nav.js"></script>
+<div id="loginOverlay">
+  <div class="panel" style="width:340px">
+    <h2 class="brand" style="margin-bottom:12px">{{shortName}} Console</h2>
+    <div id="loginForm" style="display:flex;flex-direction:column;gap:10px">
+      <label>Email <input id="loginEmail" type="email" autocomplete="username"></label>
+      <label id="codeRow" style="display:none">Sign-in code
+        <input id="loginCode" inputmode="numeric" autocomplete="one-time-code"
+          maxlength="6" placeholder="6-digit code from your email"></label>
+      <label id="pwRow" style="display:none">Password
+        <input id="loginPw" type="password" autocomplete="current-password"></label>
+      <label id="totpRow" style="display:none">Authenticator code
+        <input id="loginTotp" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code"></label>
+      <button class="primary" id="loginBtn">Email me a code</button>
+      <p class="muted" id="loginInfo" style="display:none"></p>
+      <p class="muted" id="loginErr" style="color:var(--danger)"></p>
+      <p class="muted"><a href="#" id="modeLink">Use a password instead</a>
+        <a href="#" id="resendLink" style="display:none;margin-left:10px">Send a new code</a></p>
+      <p class="muted" id="setupHint" style="display:none">
+        First run? <a href="setup.html">Create the coordinator account</a>.</p>
+    </div>
+    <div id="changePwForm" style="display:none;flex-direction:column;gap:10px">
+      <p>You must set a new password before continuing.</p>
+      <label>New password <span class="muted">(10+ characters)</span>
+        <input id="newPw" type="password" autocomplete="new-password"></label>
+      <label>Repeat <input id="newPw2" type="password" autocomplete="new-password"></label>
+      <button class="primary" id="changePwBtn">Set password</button>
+      <p class="muted" id="changePwErr" style="color:var(--danger)"></p>
+    </div>
+  </div>
+</div>
+
+<div id="pageBanner"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="observeBanner"></div>{{^ready.helpline}}
+<div id="notConfigured" style="background:#b91c1c;color:#fff;padding:10px 16px;text-align:center;font-weight:600">
+  Caller chat is switched off: this deployment's profile has no helpline phone or
+  emergency number. Set them in profiles/{{id}}.json (see ONBOARDING.md).
+</div>{{/ready.helpline}}
+
+<header>
+  <h1>Console</h1>
+  <span id="onCallChip"></span>
+  <div id="statusSeg">
+    <button data-status="on_shift">On shift</button>
+    <button data-status="backup">Backup (on call)</button>
+    <button data-status="off">Off</button>
+  </div>
+</header>
+
+<!-- Phones: one column at a time, picked here. -->
+<div id="mobileTabs" role="tablist">
+  <button data-tab="queue" role="tab">Waiting <span id="tabQueueN" class="tabN"></span></button>
+  <button data-tab="chat" role="tab">Chat</button>
+  <button data-tab="record" role="tab">Caller &amp; intake</button>
+</div>
+
+<main data-tab="queue">
+  <div class="col" id="queueCol">
+    <div class="panel" style="flex:1;overflow-y:auto">
+      <h3>Waiting</h3>
+      <div id="queueList"><p class="muted">No one is waiting.</p></div>
+    </div>
+    <div class="panel">
+      <h3>My chat</h3>
+      <div id="myChats"><p class="muted">None active.</p></div>
+      <button id="phoneBtn" style="margin-top:8px;width:100%"
+        title="For a phone call: opens a blank intake, with no chat and no pre-chat answers">
+        Start phone intake</button>
+      <button id="helpBtn" style="margin-top:8px;width:100%">Ask for help</button>
+    </div>
+    <div class="panel" style="max-height:220px;overflow-y:auto">
+      <h3>My follow-ups</h3>
+      <div id="fuList"><p class="muted">None open.</p></div>
+    </div>
+    <div class="panel" style="max-height:260px;overflow-y:auto">
+      <h3>Active directives</h3>
+      <p class="muted" style="margin-bottom:6px">Review at the start of your shift.</p>
+      <div id="activeDirectives"><p class="muted">None.</p></div>
+    </div>
+  </div>
+
+  <div class="col" id="chatCol">
+    <div class="panel" id="chatPanel">
+      <div id="chatHead"><span class="muted">Accept a waiting chat to begin.</span></div>
+      <div class="msgs" id="msgs"></div>
+      <div id="composerWrap" style="display:none">
+        <div id="cannedPop"></div>
+        <div id="composer">
+          <input id="input" placeholder='Type a message — press "/" for canned responses' autocomplete="off">
+          <button class="primary" id="sendBtn">Send</button>
+          <button class="danger" id="endBtn">End chat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="recordResize" title="Drag to resize the caller record"></div>
+  <div class="col" id="recordCol">
+    <div class="panel" style="flex:1">
+      <div id="feedbackBox"></div>
+      <h3>Caller record</h3>
+      <div id="directivesList"></div>
+      <div id="callerInfo"><p class="muted">No active chat.</p></div>
+      <div id="directiveCtl" style="display:none;margin-top:8px">
+        <button id="addDirectiveBtn" style="width:100%">Add directive</button>
+      </div>
+      <div id="observeCtl" style="display:none;margin-top:8px">
+        <button id="inviteObserverBtn" style="width:100%">Invite trainee observer</button>
+        <button id="followupBtn" style="width:100%;margin-top:6px">Schedule follow-up</button>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--line);margin:12px 0">
+      <div id="referralsWrap" style="display:none">
+        <h3>Referrals</h3>
+        <div id="refSelected"><span class="muted">None yet.</span></div>
+        <input id="refSearch" placeholder="Search the resource directory…" autocomplete="off">
+        <div id="refResults"></div>
+        <p class="muted" style="font-size:12px;margin-top:4px">
+          Missing a resource? <a href="resources.html" target="_blank">Suggest one</a>.</p>
+        <div id="prevReferrals"></div>
+        <hr style="border:none;border-top:1px solid var(--line);margin:12px 0">
+      </div>
+      <h3>Intake <span id="saveState"></span></h3>
+      <p class="muted" id="intakeAnonNote" style="display:none;margin-bottom:8px">
+        Respect the anonymity of callers — never include names in an intake.</p>
+      <form class="intake" id="intakeForm" style="display:none">
+        <div id="intakeFields"></div>
+        <button class="primary" type="submit" id="submitIntakeBtn">Submit intake</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script src="console.js"></script>{{#features.voice}}
+<script src="voicepanel.js"></script>{{/features.voice}}
+</body>
+</html>

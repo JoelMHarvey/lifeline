@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Admin</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
+  td, th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin: 12px 0; }
+  .row label { font-size: 13px; }
+  .row input, .row select { width: auto; }
+  #tempPw { background:#dcfce7; border:1px solid #86efac; border-radius:8px;
+    padding:8px 12px; display:none; margin:8px 0; font-family:monospace; }
+  textarea { font-family: monospace; }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">Admin — volunteers &amp; staff</h1>
+<p class="muted">Coordinator only. Every action is recorded in the audit log.</p>{{#features.orgEditor}}
+
+<div class="panel" style="margin-top:14px">
+  <h3 style="margin-bottom:6px">Organisation</h3>
+  <p class="muted">The names this service uses in emails, notifications, calendar feeds and
+    page titles. Leave a box empty to use the default shown in grey. Where pages are a
+    static build (Vercel), page titles keep the profile's names; change those in the
+    profile file.</p>
+  <div id="orgEditor" class="muted">Loading…</div>
+</div>{{/features.orgEditor}}
+
+<div class="panel" style="margin-top:14px">
+  <h3 style="margin-bottom:6px">Add one person</h3>
+  <div class="row">
+    <label>Name <input id="nName"></label>
+    <label>Email <input id="nEmail" type="email"></label>
+    <label>Role <select id="nRole">
+      <option>trainee</option><option selected>worker</option>
+      <option>supervisor</option><option>coordinator</option></select></label>
+    <label>Phone <input id="nPhone" placeholder="optional"></label>
+    <button class="primary" id="nAdd">Add</button>
+  </div>
+  <div id="tempPw"></div>
+</div>
+
+<div class="panel" style="margin-top:14px">
+  <h3 style="margin-bottom:6px">CSV import{{#legacy.system}} (from the {{legacy.system}} Vols–Staff export){{/legacy.system}}</h3>
+  <p class="muted">Header row: <code>email,name,role,programs,phone,group</code> — programs separated by
+    <code>|</code>; <code>group</code> is optional{{#schedule.groupPrefix}} (a name like <code>{{schedule.groupPrefix}}08 Alex M</code> also sets group 8){{/schedule.groupPrefix}}.
+    Each row gets a temporary password shown below; people set their own on first login.</p>
+  <textarea id="csv" rows="5" style="width:100%;margin-top:8px"
+    placeholder="email,name,role,programs,phone,group&#10;worker@example.org,{{#schedule.groupPrefix}}{{schedule.groupPrefix}}13 {{/schedule.groupPrefix}}Alex,worker,Live Chat,,"></textarea>
+  <button class="primary" id="importBtn" style="margin-top:8px">Import</button>
+  <pre id="importOut" class="muted" style="margin-top:8px;white-space:pre-wrap"></pre>
+</div>
+
+<div class="panel" style="margin-top:14px" data-module="helpline">
+  <h3 style="margin-bottom:6px">Intake form options</h3>
+  <p class="muted">Add, rename, reorder or retire the choices of every intake field —
+    no deploy needed. Each save publishes a new version; past records keep the
+    wording they were written under, and retired options disappear from new
+    forms but stay in history and reports.</p>
+  <div id="formEditor" style="margin-top:10px"><button id="loadFormBtn">Open the editor</button></div>
+</div>
+
+<div class="panel" style="margin-top:14px" data-module="helpline">
+  <h3 style="margin-bottom:6px">Canned responses</h3>
+  <p class="muted">The ready-made replies support workers pick by typing <code>/</code> in the
+    chat console. Add, edit or delete the shared ones (and start from {{org}}'s starter set
+    when there are none). Workers can also keep a few of their own, reached from the
+    link at the bottom of the <code>/</code> list.</p>
+  <p style="margin-top:8px"><a href="canned.html" style="font-weight:600">Manage canned responses →</a></p>
+</div>
+
+<div class="panel" style="margin-top:14px" data-module="helpline">
+  <h3 style="margin-bottom:6px">Keeping records</h3>
+  <p class="muted">Conversations older than this are deleted for good: transcripts, intake
+    answers, supervisor feedback and referrals, plus closed follow-ups, retired directives
+    and help requests. Open follow-ups and active directives stay. Backups keep what they
+    held when they were taken.</p>
+  <div class="row" style="margin-top:8px">
+    <label>Keep conversations for <select id="retDays">
+      <option value="90">3 months</option><option value="182">6 months</option>
+      <option value="365">1 year</option><option value="730">2 years</option>
+      <option value="1095">3 years</option><option value="1825">5 years</option>
+      <option value="2555">7 years</option><option value="0">until someone deletes them</option>
+    </select></label>
+    <button class="primary" id="retSave">Save</button>
+    <span id="retMsg" class="muted"></span>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:14px">
+  <div class="row" style="margin:0 0 4px">
+    <h3 style="margin:0;flex:1">Everyone</h3>
+    <label>Filter role <select id="fRole"><option value="">all</option>
+      <option>trainee</option><option>worker</option><option>supervisor</option>
+      <option>coordinator</option></select></label>
+    <label>Status <select id="fStatus"><option value="">all</option>
+      <option value="in_service">in service</option><option value="on_leave">on leave</option>
+      <option value="left">left</option></select></label>
+  </div>
+  <table id="tbl"></table>
+</div>
+
+<script src="admin.js"></script>
+<script src="retention.js"></script>{{#features.orgEditor}}
+<script src="orgeditor.js"></script>{{/features.orgEditor}}
+</body>
+</html>

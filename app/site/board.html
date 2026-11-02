@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Noticeboard</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  main { display: grid; grid-template-columns: 300px 1fr; gap: 14px; margin-top: 14px;
+    align-items: start; }
+  .topic { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px;
+    margin-bottom: 8px; cursor: pointer; font-size: 14px; display: flex; gap: 8px;
+    align-items: center; }
+  .topic:hover, .topic.sel { background: var(--soft); }
+  .topic .name { flex: 1; font-weight: 600; }
+  .topic .pin { color: var(--warn); }
+  .post { border-bottom: 1px solid var(--line); padding: 10px 2px; }
+  .post .meta { font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+  .post .body { white-space: pre-wrap; word-break: break-word; font-size: 14px; }
+  #composer { margin-top: 12px; }
+  @media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">Noticeboard</h1>
+<p class="muted">The Workers' and Director's Notebooks and protocols live here —
+read at the start of your shift, leave notes for the next shift at the end.
+Entries can mention service users, so treat this board like any other record.</p>
+
+<main>
+  <div>
+    <div class="panel">
+      <h3 style="margin-bottom:8px">Topics</h3>
+      <div id="topics"><p class="muted">Loading…</p></div>
+      <button id="newTopicBtn" style="display:none;width:100%;margin-top:6px">New topic</button>
+    </div>
+  </div>
+  <div class="panel">
+    <div id="topicHead"><p class="muted">Pick a topic.</p></div>
+    <div id="posts"></div>
+    <div id="composer" style="display:none">
+      <textarea id="postBody" rows="3" placeholder="Write a note for the board…"></textarea>
+      <button class="primary" id="postBtn" style="margin-top:6px">Post</button>
+    </div>
+  </div>
+</main>
+
+<script src="board.js"></script>
+</body>
+</html>

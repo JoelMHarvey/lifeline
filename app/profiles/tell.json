@@ -1,0 +1,218 @@
+{
+  "id": "tell",
+  "name": "TELL Lifeline",
+  "shortName": "TELL",
+  "longName": "TELL — Tokyo English Lifeline",
+  "org": "TELL",
+  "manual": "TELL Manual",
+  "website": "https://telljp.com",
+  "timezone": "Asia/Tokyo",
+  "phone": "03-5774-0992",
+  "emergency": {
+    "primary": { "number": "119", "label": "ambulance/fire" },
+    "secondary": { "number": "110", "label": "police" }
+  },
+  "mail": { "fromName": null },
+  "colors": {
+    "bg": "#f5f9f9",
+    "panel": "#ffffff",
+    "line": "#d9e6e5",
+    "ink": "#21302f",
+    "muted": "#5c6f6d",
+    "accent": "#00a79d",
+    "accentDark": "#008a81",
+    "accentInk": "#ffffff",
+    "deep": "#0b3d3a",
+    "soft": "#e3f3f1"
+  },
+  "logo": {
+    "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='#00a79d' d='M22 2 2 10.5l6.5 2.2L21 4 10.8 14l.2 6 3.4-4.1 5.1 1.7z'/></svg>"
+  },
+  "text": {
+    "cssHeader": "TELL Lifeline — shared styles, matched to the telljp.com brand:\n   TELL teal, white panels, charcoal ink, serif display headings, and the\n   paper-plane motif.",
+    "logoName": "The TELL paper plane",
+    "siteLabel": " test site",
+    "passcodeIntro": "This is the private trial of the new TELL Lifeline platform (synthetic\n     data only). ",
+    "indexNotice": "Synthetic data only. Not a live service.",
+    "slotNoteExample": "e.g. SS2, 10th OS, WEBEX",
+    "supervisionHours": "as standard: weekends 09:00–21:00 and 21:00–09:00,\n  Friday night 21:00–02:00"
+  },
+  "safetyValveMessage": "We are very sorry — all of our support workers are helping other people right now. Please try again in a little while. If you are in immediate danger, call {{emergency.primary.number}} ({{emergency.primary.label}}) or {{emergency.secondary.number}} ({{emergency.secondary.label}}). {{name}} phone: {{phone}}.",
+  "schedule": {
+    "groupPrefix": "S",
+    "shifts": [
+      [1, "Shift 1", "08:30", "12:30", "09:00", {"default": "phone"}],
+      [2, "Shift 2", "12:00", "16:00", "12:30", {"default": "phone"}],
+      [
+        3,
+        "Shift 3",
+        "15:30",
+        "19:30",
+        "16:00",
+        { "default": "chat", "sat": "both", "sun": "both", "mon": "both" }
+      ],
+      [4, "Shift 4", "19:00", "23:00", "19:30", {"default": "both"}],
+      [5, "Shift 5", "22:00", "02:00", "22:30", {"default": "chat"}],
+      [6, "Shift 6", "01:30", "05:30", "02:00", {"default": "chat"}],
+      [7, "Shift 7", "05:00", "09:00", "05:30", {"default": "phone"}]
+    ],
+    "supervision": [
+      [8, "OCS Day", "09:00", "21:00", {"sat": ["09:00", "21:00"], "sun": ["09:00", "21:00"]}],
+      [
+        9,
+        "OCS Night",
+        "21:00",
+        "09:00",
+        { "fri": ["21:00", "02:00"], "sat": ["21:00", "09:00"], "sun": ["21:00", "09:00"] }
+      ]
+    ],
+    "weekSeats": {
+      "3": { "sun": 2, "mon": 2, "tue": 1, "wed": 1, "thu": 1, "fri": 1, "sat": 2 },
+      "4": { "sun": 3, "mon": 3, "tue": 2, "wed": 2, "thu": 2, "fri": 2, "sat": 4 },
+      "5": { "sun": 1, "mon": 0, "tue": 0, "wed": 0, "thu": 0, "fri": 1, "sat": 1 },
+      "6": { "sun": 1, "mon": 0, "tue": 0, "wed": 0, "thu": 0, "fri": 0, "sat": 1 },
+      "7": { "sun": 1, "mon": 1, "tue": 0, "wed": 0, "thu": 0, "fri": 0, "sat": 0 }
+    }
+  },
+  "import": { "tellWorkbook": true },
+  "forms": {
+    "regionField": {
+      "id": "prefecture",
+      "type": "select",
+      "label": "Prefecture",
+      "options": [
+        { "id": "hokkaido", "label": "Hokkaido" },
+        { "id": "aomori", "label": "Aomori" },
+        { "id": "iwate", "label": "Iwate" },
+        { "id": "miyagi", "label": "Miyagi" },
+        { "id": "akita", "label": "Akita" },
+        { "id": "yamagata", "label": "Yamagata" },
+        { "id": "fukushima", "label": "Fukushima" },
+        { "id": "ibaraki", "label": "Ibaraki" },
+        { "id": "tochigi", "label": "Tochigi" },
+        { "id": "gunma", "label": "Gunma" },
+        { "id": "saitama", "label": "Saitama" },
+        { "id": "chiba", "label": "Chiba" },
+        { "id": "tokyo", "label": "Tokyo" },
+        { "id": "kanagawa", "label": "Kanagawa" },
+        { "id": "niigata", "label": "Niigata" },
+        { "id": "toyama", "label": "Toyama" },
+        { "id": "ishikawa", "label": "Ishikawa" },
+        { "id": "fukui", "label": "Fukui" },
+        { "id": "yamanashi", "label": "Yamanashi" },
+        { "id": "nagano", "label": "Nagano" },
+        { "id": "gifu", "label": "Gifu" },
+        { "id": "shizuoka", "label": "Shizuoka" },
+        { "id": "aichi", "label": "Aichi" },
+        { "id": "mie", "label": "Mie" },
+        { "id": "shiga", "label": "Shiga" },
+        { "id": "kyoto", "label": "Kyoto" },
+        { "id": "osaka", "label": "Osaka" },
+        { "id": "hyogo", "label": "Hyogo" },
+        { "id": "nara", "label": "Nara" },
+        { "id": "wakayama", "label": "Wakayama" },
+        { "id": "tottori", "label": "Tottori" },
+        { "id": "shimane", "label": "Shimane" },
+        { "id": "okayama", "label": "Okayama" },
+        { "id": "hiroshima", "label": "Hiroshima" },
+        { "id": "yamaguchi", "label": "Yamaguchi" },
+        { "id": "tokushima", "label": "Tokushima" },
+        { "id": "kagawa", "label": "Kagawa" },
+        { "id": "ehime", "label": "Ehime" },
+        { "id": "kochi", "label": "Kochi" },
+        { "id": "fukuoka", "label": "Fukuoka" },
+        { "id": "saga", "label": "Saga" },
+        { "id": "nagasaki", "label": "Nagasaki" },
+        { "id": "kumamoto", "label": "Kumamoto" },
+        { "id": "oita", "label": "Oita" },
+        { "id": "miyazaki", "label": "Miyazaki" },
+        { "id": "kagoshima", "label": "Kagoshima" },
+        { "id": "okinawa", "label": "Okinawa" },
+        { "id": "outside_japan", "label": "Outside Japan" },
+        { "id": "no_answer", "label": "Prefer not to say" }
+      ]
+    },
+    "nationalityOptions": [
+      { "id": "japan", "label": "Japan" },
+      { "id": "n_america", "label": "N. America" },
+      { "id": "uk", "label": "UK" },
+      { "id": "australia_nz", "label": "Australia, NZ" },
+      { "id": "europe", "label": "Europe" },
+      { "id": "indian_subcontinent", "label": "Indian Subcontinent" },
+      { "id": "africa", "label": "Africa" },
+      { "id": "s_america", "label": "S. America" },
+      { "id": "asia", "label": "Asia" },
+      { "id": "middle_east", "label": "Middle East" },
+      { "id": "japan_plus", "label": "Japan plus (double)" },
+      { "id": "returnee", "label": "Japanese Returnee" },
+      { "id": "other", "label": "Other" }
+    ]
+  },
+  "canned": {
+    "starter": [
+      [
+        "Welcome",
+        "Hi, thank you for reaching out to TELL. I'm here to listen. How are you feeling right now?"
+      ],
+      ["Still here", "I'm still here with you. Take whatever time you need."],
+      [
+        "Safety check",
+        "I want to make sure you are safe right now. Are you somewhere safe at the moment?"
+      ],
+      [
+        "Slow reply",
+        "Sorry to keep you waiting — I'm still with you, just taking a moment to reply properly."
+      ],
+      [
+        "Closing",
+        "Thank you for talking with me today. Please remember you can reach us again any time. Take care of yourself."
+      ],
+      [
+        "Emergency",
+        "If you are in immediate danger, please call 119 (ambulance) or 110 (police) right now. Would you like to talk through what is happening?"
+      ],
+      [
+        "Qualifications",
+        "I have been trained as a support worker. It included 70 hours of classroom work and an online apprenticeship."
+      ],
+      ["Supervision", "I am working under professional supervision."]
+    ]
+  },
+  "seed": {
+    "boardTopics": [["Workers' Notebook", 0], ["Director's Notebook", 0], ["Protocols & Key Numbers", 1]],
+    "resources": [
+      [
+        "TELL Counseling",
+        "Counseling & Support",
+        "Professional counseling in English",
+        "https://telljp.com/counseling/",
+        "03-4550-1146"
+      ],
+      [
+        "Tokyo Mental Health",
+        "Counseling & Support",
+        "English-speaking therapists in Tokyo",
+        "https://www.tokyomentalhealth.com",
+        null
+      ],
+      [
+        "Yorisoi Hotline",
+        "Crisis lines",
+        "Multilingual 24/7 support line",
+        "https://www.since2011.net/yorisoi/",
+        "0120-279-338"
+      ],
+      ["Inochi no Denwa", "Crisis lines", "Japanese-language crisis line", null, "0570-783-556"],
+      [
+        "Himawari Medical Info",
+        "Health",
+        "Tokyo Metropolitan medical institution search (English)",
+        null,
+        "03-5285-8181"
+      ]
+    ]
+  },
+  "features": { "orgEditor": false, "shiftEditor": false, "setupWizard": false, "voice": false },
+  "legacy": { "system": "iCarol", "board": "Chatboard" },
+  "prototype": true
+}

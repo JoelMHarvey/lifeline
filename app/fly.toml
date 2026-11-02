@@ -1,0 +1,38 @@
+# Fly.io config: one machine with a persistent volume for the embedded
+# Postgres (PGlite), or set DATABASE_URL to use an external Postgres.
+# Change the app name and pick the region closest to your callers
+# (e.g. lhr, fra, iad, nrt, syd). Deploy steps are in DEPLOY.md.
+
+app = "my-lifeline"
+primary_region = "lhr"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  TL_PGDATA = "/data/pgdata"
+
+[mounts]
+  source = "lifeline_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  # Exactly one always-on machine: the queue sweep (backup paging, safety
+  # valve) must keep running, and an embedded database means no
+  # horizontal scaling.
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/healthz"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

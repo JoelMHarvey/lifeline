@@ -1,0 +1,24 @@
+{
+  "name": "lifeline",
+  "version": "1.0.0",
+  "description": "Chat helpline platform for crisis lifelines: caller chat, queue with backup paging, worker console, intake records, shift scheduler. Self-hosted, one deployment per organisation.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node tools/render-site.js",
+    "render": "node tools/render-site.js",
+    "seed": "node seed.js",
+    "test": "node tools/run-tests.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "express": "^4.22.2",
+    "nodemailer": "^10.0.10",
+    "pg": "^8.23.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "exceljs": "^4.4.0"
+  }
+}

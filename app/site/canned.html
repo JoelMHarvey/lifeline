@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Canned responses</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  h2 { font-size: 16px; margin: 22px 0 8px; }
+  form.add, .cr form { display: flex; flex-direction: column; gap: 8px; }
+  form.add label, .cr form label { font-size: 13px; color: var(--muted); }
+  form.add input[type=text], .cr form input[type=text] { width: 100%; max-width: 320px; }
+  form.add textarea, .cr form textarea { width: 100%; min-height: 70px; font: inherit; font-size: 14px; }
+  .check { display: flex; align-items: center; gap: 6px; color: var(--ink) !important; }
+  .check input { width: auto; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .err { color: var(--danger); font-size: 13px; }
+  .err:empty { display: none; }
+  .cr { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+        padding: 10px 12px; margin-bottom: 8px; }
+  .cr .top { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .cr .label { font-weight: 700; flex: 1; min-width: 140px; }
+  .cr .label kbd { font-weight: 400; }
+  .cr .body { white-space: pre-wrap; font-size: 14px; margin-top: 4px; }
+  .cr .btns button { font-size: 13px; padding: 3px 10px; }
+  .cr button.del { color: var(--danger); }
+  .empty { margin: 4px 0 10px; }
+  [hidden] { display: none !important; }
+  kbd { border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; font-size: 12px; background: var(--soft); }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">Canned responses</h1>
+<p class="muted">Ready-made replies for the chat console: type <kbd>/</kbd> in the message box,
+  then a word from the name or message to narrow the list, and press <kbd>Enter</kbd> to drop it
+  into the box (you can still edit it before sending). Shared responses are for everyone;
+  <span id="whoShares">supervisors and coordinators look after those</span>. Your own are
+  only seen by you.</p>
+
+<div class="panel">
+  <form class="add" id="addForm">
+    <strong>Add a response</strong>
+    <label>Name <span class="muted">(what you type after <kbd>/</kbd> to find it)</span>
+      <input type="text" id="addLabel" maxlength="60" placeholder="e.g. Welcome" required></label>
+    <label>Message
+      <textarea id="addBody" maxlength="2000" required
+        placeholder="Hi, thank you for reaching out to {{shortName}}. I'm here to listen."></textarea></label>
+    <label class="check" id="addSharedWrap" hidden><input type="checkbox" id="addShared" checked>
+      Share with everyone</label>
+    <div class="btns"><button class="primary" type="submit">Add</button>
+      <span class="err" id="addErr"></span></div>
+  </form>
+</div>
+
+<h2>Shared with everyone</h2>
+<div id="starter" class="panel" hidden>
+  <p>There are no shared responses yet. Start from {{org}}'s starter set (Welcome, Still here,
+    Safety check, Slow reply, Closing, Emergency, and the Manual's Qualifications and Supervision
+    scripts), then edit them to suit.</p>
+  <div class="btns"><button id="starterBtn">Add the starter set</button>
+    <span class="err" id="starterErr"></span></div>
+</div>
+<div id="sharedList" class="muted">Loading…</div>
+
+<h2>Just mine</h2>
+<div id="mineList" class="muted"></div>
+
+<script src="canned.js"></script>
+</body>
+</html>

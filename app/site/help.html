@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{name}} — Help</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 1150px; margin: 0 auto; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  main { display: grid; grid-template-columns: 240px 1fr; gap: 20px; margin-top: 16px;
+    align-items: start; }
+  main > nav { position: sticky; top: 16px; }
+  main > nav a { display: block; padding: 5px 10px; border-radius: 8px; color: var(--ink);
+    text-decoration: none; font-size: 14px; }
+  main > nav a:hover { background: var(--soft); }
+  main > nav .grp { font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--muted); margin: 12px 0 2px 10px; }
+  article section { background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px 22px; margin-bottom: 16px; }
+  article h2 { font-size: 17px; margin-bottom: 4px; }
+  article h3 { font-size: 14px; margin: 14px 0 4px; }
+  article p, article li { font-size: 14px; line-height: 1.55; }
+  article ul, article ol { padding-left: 22px; margin: 6px 0; }
+  .who { font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; border-radius: 999px; padding: 2px 10px;
+    display: inline-block; margin-bottom: 8px; }
+  .who.everyone { background: #dcfce7; color: #166534; }
+  .who.workers { background: #dbeafe; color: #1e40af; }
+  .who.supervisors { background: #fef3c7; color: #92400e; }
+  .who.coordinators { background: #fee2e2; color: #991b1b; }
+  kbd { background: var(--soft); border: 1px solid var(--line); border-radius: 5px;
+    padding: 0 6px; font-family: inherit; font-size: 13px; }
+  .tip { background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px;
+    padding: 8px 12px; font-size: 13px; margin: 8px 0; }
+  .warn { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px;
+    padding: 8px 12px; font-size: 13px; margin: 8px 0; }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; } nav { position: static; } }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">{{name}} — user guide</h1>
+<p class="muted">Everything in one place. Sections are tagged by who they're for.</p>
+
+<main>
+<nav>
+  <div class="grp">Everyone</div>
+  <a href="#start">Getting started</a>
+  <a href="#shift">Your shift &amp; the schedule</a>
+  <a href="#board">The noticeboard</a>
+  <div class="grp">Support workers</div>
+  <a href="#chat">Taking a chat</a>
+  <a href="#intake">Writing the intake</a>
+  <a href="#record">The caller record</a>
+  <a href="#followups">Follow-ups &amp; referrals</a>
+  <div class="grp">Supervisors</div>
+  <a href="#supervise">Review, feedback &amp; the wallboard</a>
+  <div class="grp">Coordinators</div>
+  <a href="#admin">Admin, forms &amp; operations</a>
+  <div class="grp">Help</div>
+  <a href="#faq">Troubleshooting</a>
+</nav>
+
+<article>
+
+<section id="start">
+  <span class="who everyone">Everyone</span>
+  <h2>Getting started</h2>
+  <p>Open the console and enter your email address — press
+  <strong>Email me a code</strong> and a 6-digit sign-in code arrives in your
+  inbox. Type it in and you're in. Codes last 10 minutes and work once; no
+  password to remember. Prefer a password? Use the
+  <em>"Use a password instead"</em> link — if your account came with a
+  <strong>temporary password</strong>, that path makes you set your own
+  (10+ characters) the first time. You can set or change a password any time
+  from My profile.</p>
+  <h3>Set up your profile</h3>
+  <ul>
+    <li><strong>My profile → Display name</strong>: this is your <em>code name</em> —
+      the only name callers ever see. Use the same one every time, per the
+      {{manual}}. Your real name never reaches a caller.</li>
+    <li><strong>Authenticator app (TOTP)</strong>: strongly recommended. My profile →
+      "Set up authenticator" shows a secret to add to Google Authenticator or
+      similar; enter the 6-digit code to confirm. From then on, login asks for
+      a code too.</li>
+    <li><strong>Phone</strong>: supervisors' numbers power the tap-to-call
+      "On call" chip in the console header.</li>
+  </ul>
+  <h3>Your status</h3>
+  <p>The three buttons top-right of the console are how the system knows who is
+  available:</p>
+  <ul>
+    <li><strong>On shift</strong> — you're on the line; waiting callers appear in
+      your queue.</li>
+    <li><strong>Backup (on call)</strong> — you're not on the line, but if a
+      caller waits too long you'll be paged (in the console, and in Google Chat
+      if the team webhook is set up).</li>
+    <li><strong>Off</strong> — no pages, no queue.</li>
+  </ul>
+</section>
+
+<section id="shift">
+  <span class="who everyone">Everyone</span>
+  <h2>Your shift &amp; the schedule</h2>
+  <p>The <strong>Schedule</strong> page is the month at a glance: red = unstaffed,
+  amber = assigned but not yet confirmed, green = confirmed, dashed = someone
+  needs cover. 👁 marks On Call Supervisor cover — the day and night blocks
+  on the days they run{{#text.supervisionHours}} ({{text.supervisionHours}}){{/text.supervisionHours}}, created with the month and assignable only to
+  supervisors and coordinators. A shift can carry more than one person:
+  🎓 marks an observation shift (OS) and 🤝 a supervised shift (SS) — a new
+  volunteer sitting in beside the worker — numbered per person automatically
+  (OS3 is their third observation). Hover over any slot for its hours.
+  Staff click a slot to assign it, add a note, change that day's hours, add
+  someone else to the shift, request cover or cancel it; coordinators change
+  the OCS weekly pattern under <strong>Supervisor hours</strong>.</p>
+  <h3>Submitting availability</h3>
+  <ol>
+    <li>Open the month you're submitting for with the ‹ › arrows.</li>
+    <li>Tick the shifts you <em>can</em> work — and under each ticked shift,
+      untap any weekdays you can't do it on (all days are on by default). Say
+      how many shifts you'd like, and use the <strong>"Only, Nots and
+      Also"</strong> box for one-off specifics (e.g. <em>NOT the 3rd
+      Monday</em>).</li>
+    <li>Submit <strong>every month</strong>, even if you're away — the manual's
+      rule, so the scheduler never has to chase. Resubmitting replaces your
+      earlier answer.</li>
+  </ol>
+  <h3>Confirming and swapping</h3>
+  <ul>
+    <li>Your assigned shifts appear under <strong>My shifts</strong> — press
+      <strong>Confirm</strong> when you're sure you can make it (aim for 72–24
+      hours before, per the manual).</li>
+    <li>Can't make a shift? Press <strong>"Can't make it"</strong>. The shift shows
+      as <em>cover wanted</em> to the whole team and staff are notified — but it
+      stays yours until a colleague presses <strong>Take it</strong>. Finding a
+      replacement remains your responsibility — though for last-minute gaps a
+      supervisor can press <strong>Email everyone</strong> to send a ready-made
+      (and editable) cover request to everyone who could take the shift, each
+      person getting their own copy.</li>
+    <li><strong>Calendar feed</strong> gives you a private URL — subscribe from
+      Google Calendar ("Add other calendars → From URL") and your {{shortName}} shifts
+      appear in your own calendar. Don't share the URL; it's yours.</li>
+  </ul>
+  <h3>At the start of your shift</h3>
+  <p>The console front page is built around the manual's checklist: the
+  <strong>Active directives</strong> panel (read it every shift), your unread
+  <strong>Noticeboard</strong> badge (the notebooks), and any
+  <strong>feedback from your supervisor</strong> waiting at the top right.</p>
+</section>
+
+<section id="board">
+  <span class="who everyone">Everyone</span>
+  <h2>The noticeboard</h2>
+  <p>{{#legacy.board}}The noticeboard replaces the {{legacy.board}}. {{/legacy.board}}Three topics are always there:</p>
+  <ul>
+    <li><strong>Workers' Notebook</strong> — shift-to-shift handover. If you expect
+      a service user to contact us again for specific information, leave the
+      details here for the next shift (the manual's "Follow-up Expected" note).</li>
+    <li><strong>Director's Notebook</strong> — messages to and from the Lifeline
+      Director.</li>
+    <li><strong>Protocols &amp; Key Numbers</strong> (pinned) — the emergency
+      procedures to review at shift start.</li>
+  </ul>
+  <p>Unread counts show against each topic and on the console's Noticeboard
+  link. Posts can mention service users, so the board is encrypted and stays
+  inside the system — treat it like any other record.</p>
+</section>
+
+<section id="chat">
+  <span class="who workers">Support workers</span>
+  <h2>Taking a chat</h2>
+  <ol>
+    <li>Set yourself <strong>On shift</strong>. Waiting callers appear on the left
+      with their pre-chat concern and wait time. A red
+      <em>risk indicated</em> badge means the pre-chat survey flagged suicidal
+      thoughts or recent self-harm — these callers jump the queue.</li>
+    <li>Press <strong>Accept</strong>. The caller is told they're connected to your
+      code name; their whole pre-chat survey is in the caller record on the right.</li>
+    <li>Type <kbd>/</kbd> in the message box for canned responses — including the
+      manual's qualification scripts ("Qualifications", "Supervision"), the
+      safety check, and the emergency numbers. The link at the
+      bottom of that list opens the <a href="canned.html">Canned responses</a> page:
+      add your own there. Supervisors and coordinators look after the shared ones
+      (coordinators also find it under <strong>Admin</strong>, with a one-click
+      starter set when there are none).</li>
+    <li><strong>Ask for help</strong> pings every supervisor and backup, with your
+      note — use it any time, mid-chat or not. You are not alone.</li>
+    <li><strong>End chat</strong> when the conversation closes; then finish and
+      submit the intake. If the caller disappears, the system notices within
+      about a minute and tells you — you can still submit the intake.</li>
+  </ol>
+  <p class="tip">Trainees: your console is read-only. When a worker or supervisor
+  invites you to observe, the live chat appears on your screen; the caller is
+  never told.</p>
+</section>
+
+<section id="intake">
+  <span class="who workers">Support workers</span>
+  <h2>Writing the intake</h2>
+  <p>Every contact gets an intake. The form auto-saves as you type — a crash or
+  refresh loses nothing — and much of it is pre-filled from the caller's own
+  pre-chat answers, so you correct rather than retype. Times, duration, queue
+  wait and the transcript are recorded automatically. The badge beside
+  <em>Intake</em> shows "draft saved" with the time; if it turns red ("not
+  saved — retrying") your connection dropped and it keeps trying. Submitting
+  shows a green confirmation at the bottom of the screen.</p>
+  <ul>
+    <li><strong>Phone calls</strong>: press <strong>Start phone intake</strong>
+      under My chat. You get the same intake with nothing pre-filled (phone
+      callers have no pre-chat survey), plus referrals and follow-ups;
+      submitting it ends the call. Started one by mistake? <em>Discard</em>
+      at the top throws it away.</li>
+    <li><strong>The Mandatory Suicide Question</strong> works as a ladder:
+      answer Ideation, and Intention / Plan / Means only appear as you go —
+      rungs you never reach are never recorded as "asked".</li>
+    <li><strong>"User's feelings and brief content"</strong> is about the service
+      user; <strong>"Process of the conversation"</strong> is about you and what
+      you did — skills used, what worked, what you checked.</li>
+    <li><strong>"Would you like your supervisor to follow up with you?"</strong> —
+      answering yes opens an item in the supervisor review queue. Use it after
+      any conversation that stays with you.</li>
+    <li><strong>Highlight this contact</strong> puts it on the wallboard so other
+      workers are aware of the incident.</li>
+  </ul>
+  <p class="warn">Respect the anonymity of callers — <strong>never include names
+  in an intake</strong>. The reminder above the form is the manual's rule.</p>
+</section>
+
+<section id="record">
+  <span class="who workers">Support workers</span>
+  <h2>The caller record</h2>
+  <p>The right-hand column shows everything known about the caller: their
+  pre-chat answers, how many times they've contacted us today and before, any
+  <strong>directives</strong> (colour-coded info / caution / alert — read them
+  before engaging), and previous referrals. Drag the divider between the chat
+  and the record to make either side bigger; your width is remembered.</p>
+</section>
+
+<section id="followups">
+  <span class="who workers">Support workers</span>
+  <h2>Follow-ups &amp; referrals</h2>
+  <ul>
+    <li><strong>Referrals</strong>: search the resource directory from inside the
+      chat and attach what you refer. Previous referrals to the same caller show
+      automatically. Missing a resource? Suggest it — a coordinator approves it
+      into the directory.</li>
+    <li><strong>Schedule follow-up</strong> creates a dated reminder attached to
+      the caller; your open follow-ups sit on the console's left column, marked
+      red when overdue, with a Done button.</li>
+  </ul>
+</section>
+
+<section id="supervise">
+  <span class="who supervisors">Supervisors</span>
+  <h2>Review, feedback &amp; the wallboard</h2>
+  <ul>
+    <li><strong>Review</strong> lists workers who asked for follow-up first, then
+      recent submitted intakes (⚑ marks highlighted contacts). Open one to see
+      the intake beside the transcript, and send feedback — the worker sees it
+      at their next login and acknowledges it. Sending feedback marks the intake
+      reviewed. Opening a contact here is recorded in the audit log.</li>
+    <li><strong>Directives</strong>: add one from any active chat's caller record
+      (Add directive) with a level — info, caution, or alert. Retire it when it
+      no longer applies; it stays in the record.</li>
+    <li><strong>Wallboard</strong>: live queue, workers on shift, open help
+      requests, highlighted contacts, and every next-24h shift that is unstaffed
+      or unconfirmed — the manual's end-of-shift check, always on.</li>
+    <li><strong>Reports</strong>: pick a date range for outcome counts, wait
+      times, and per-question breakdowns, with CSV download. Aggregates only —
+      no content or names ever appear in reports.</li>
+    <li>On the noticeboard, supervisors create and pin topics.</li>
+  </ul>
+</section>
+
+<section id="admin">
+  <span class="who coordinators">Coordinators</span>
+  <h2>Admin, forms &amp; operations</h2>
+  <ul>
+    <li><strong>Admin → people</strong>: add workers one at a time or CSV-import{{#legacy.system}}
+      from {{legacy.system}}'s Vols–Staff export{{/legacy.system}}. Each new account gets a temporary
+      password; roles, service status, supervisor links and password resets all
+      live here. Every action is audit-logged.</li>
+    <li><strong>Admin → Intake form options</strong>: edit the choices of every
+      question on the worker intake <em>and</em> the caller pre-chat survey —
+      add, rename, reorder, retire. Each save publishes a new version instantly;
+      past records keep the wording they were written under. Nothing here needs
+      a developer.</li>
+    <li><strong>Resources</strong>: approve suggested resources, edit and retire
+      directory entries, or <strong>import from a spreadsheet</strong> — save it
+      as CSV with at least a Name column (plus any of Category, Description,
+      Website, Phone, Languages), preview what each row will do, then import.
+      Rows already in the directory are skipped unless you tick "update".</li>
+    <li><strong>Schedule</strong>: "Create month's slots" builds the empty month
+      (coordinators only), with as many seats per shift as <strong>People per
+      shift</strong> says — raise a shift to 2 for a phone line and a chat line,
+      then press "Create month's slots" again to add the seats to a month
+      already built (lowering it never removes anyone); supervisors and coordinators can click any slot to
+      assign (workers available for that shift on that weekday are marked ✓),
+      add supervisor/observer slots, set notes, or request cover. The roster
+      shows staff everyone in service — who has and hasn't submitted, with a
+      filter box, each name a click-to-email link, and a one-click reminder to
+      exactly the people missing. Coordinators additionally get
+      <strong>Auto-fill from availability</strong> — a reviewed draft that
+      fills every open slot from what people submitted (shifts, weekdays and
+      how many they asked for — at most 4 for anyone who left that blank).
+      It shares shifts out evenly, never gives one person two shifts on a day
+      or shifts whose hours overlap, and shows how the draft is spread before
+      you apply it. It does not read "Only, Nots and Also", so check those by
+      hand — and <strong>Recent changes</strong>, the latest
+      schedule actions with a link to the full log in its own window (search,
+      filter by person or kind of change, download as CSV), availability
+      submissions and cover emails included.</li>
+    <li><strong>Ops</strong> (<code>ops.html</code>): health checks, which
+      settings are configured, the last 24h of events, and recent errors — plus
+      a button that sends test notifications to the Google Chat webhooks.</li>
+  </ul>
+  <h3>Google Chat notifications</h3>
+  <ol>
+    <li>In the team's Google Chat space: space name → <em>Apps &amp;
+      integrations → Webhooks → Add</em>. Copy the webhook URL.</li>
+    <li>Add it as <code>TL_NOTIFY_WEBHOOK_URL</code> in Vercel (and optionally a
+      second space as <code>TL_OPS_WEBHOOK_URL</code> for ops alerts), set
+      <code>TL_BASE_URL</code> to the app's address, and redeploy.</li>
+    <li>Press <strong>Send test notifications</strong> on the Ops page — both
+      channels should receive a hello.</li>
+  </ol>
+</section>
+
+<section id="faq">
+  <span class="who everyone">Everyone</span>
+  <h2>Troubleshooting</h2>
+  <h3>Something isn't working, or you'd like something changed</h3>
+  <p>Press <strong>Report a problem</strong> at the foot of the menu, on any page.
+  Say what you did, what you expected and what happened — the page you're on and
+  your browser are attached for you, so please leave out any caller details.
+  You get a reference like <strong>TL-0007</strong> and an email whenever it's
+  updated, and <strong>My problem reports</strong> shows everything you've sent
+  and what's been done. If something marked fixed still isn't right, open it
+  there and press <strong>Still not fixed</strong>. Coordinators work through
+  reports under <strong>Problems &amp; requests</strong> on the Ops page. While a
+  report is open you can add a comment to it, or close it yourself if it's
+  sorted.</p>
+  <h3>I can't log in</h3>
+  <p>First try <strong>Email me a code</strong> — it works whenever you can
+  read your email, whatever state your password is in. If no code arrives:
+  check spam, check the email is spelled as registered, and wait a minute
+  (three codes per address per quarter-hour). Otherwise: password spelled
+  right (a coordinator can reset it — you'll get a new temporary one); your
+  authenticator code if you enabled TOTP (a password reset also clears TOTP);
+  too many attempts pauses login for 15 minutes; and accounts marked "left"
+  cannot log in.</p>
+  <h3>I lost my authenticator</h3>
+  <p>Ask a coordinator to reset your password — that clears TOTP too. Log in
+  with an emailed code or the temporary password, then re-enrol the
+  authenticator from My profile.</p>
+  <h3>The chat looks frozen</h3>
+  <p>The console reconnects by itself and nothing is lost — messages you send
+  while offline show as pending and deliver when the connection returns. If it
+  persists, refresh the page: your chat, intake draft and everything else come
+  straight back.</p>
+  <h3>A caller says the chat won't load</h3>
+  <p>Ask them to try a different browser or network, and offer the phone line.
+  If several callers report it, tell a coordinator — the Ops page and
+  <code>/healthz</code> show whether the system itself is unwell.</p>
+  <h3>I'm not getting notifications</h3>
+  <p>In-console banners and pages need the console open in a tab (allow browser
+  notifications when asked). Google Chat messages need the webhook configured —
+  a coordinator can verify with the Ops page's test button.</p>
+  <h3>Something else is wrong</h3>
+  <p>Post in the Workers' Notebook or use Ask for help. For system problems,
+  coordinators check the Ops page first, then the platform logs.</p>
+</section>
+
+</article>
+</main>
+</body>
+</html>

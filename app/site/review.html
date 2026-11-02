@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Review</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  main { display: grid; grid-template-columns: 340px 1fr; gap: 14px; margin-top: 14px; }
+  .item { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px;
+    margin-bottom: 8px; cursor: pointer; font-size: 14px; }
+  .item:hover { background: var(--soft); }
+  .item.requested { border-color: #f59e0b; background: #fffbeb; }
+  .item.highlight { border-left: 4px solid var(--danger); }
+  #detail h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted); margin: 14px 0 6px; }
+  #transcript { max-height: 320px; border: 1px solid var(--line); border-radius: 10px; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; font-size: 14px; }
+  dt { color: var(--muted); }
+  dd { margin: 0; }
+  @media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">Supervisor review</h1>
+<p class="muted">Feedback requests from workers first, then recent submitted intakes.
+  Viewing a contact here is recorded in the audit log.</p>
+
+<main>
+  <div>
+    <div class="panel">
+      <h3 style="margin-bottom:8px">Feedback requested</h3>
+      <div id="requestedList"><p class="muted">Loading…</p></div>
+      <h3 style="margin:14px 0 8px">Recent submitted intakes</h3>
+      <div id="submittedList"></div>
+    </div>
+  </div>
+  <div class="panel" id="detail">
+    <p class="muted">Pick a contact to review.</p>
+  </div>
+</main>
+
+<script src="review.js"></script>
+</body>
+</html>

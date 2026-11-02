@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Problem reports</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  .row { display: flex; gap: 10px; align-items: center; margin: 14px 0; }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">My problem reports</h1>
+<p class="muted">Everything you've reported, newest first, with what's been done about it.
+  You're emailed whenever one is updated.</p>
+<div class="row">
+  <button class="primary" id="newBtn">Report a problem</button>
+</div>
+<div id="list" class="muted">Loading…</div>
+
+<script src="issuecard.js"></script>
+<script>
+  'use strict';
+  const listEl = document.getElementById('list');
+  document.getElementById('newBtn').onclick = () => window.tellNav && window.tellNav.openReport();
+  let isCoordinator = null;
+  async function load() {
+    if (isCoordinator === null) {
+      const me = await (await fetch('/api/me')).json().catch(() => ({}));
+      isCoordinator = me.role === 'coordinator';
+    }
+    const res = await fetch('/api/issues/mine');
+    if (res.status === 401) { location.href = 'console.html'; return; }
+    const rows = await res.json();
+    listEl.innerHTML = '';
+    if (!rows.length) {
+      listEl.textContent = "You haven't reported anything yet.";
+      return;
+    }
+    listEl.classList.remove('muted');
+    for (const it of rows.sort((a, b) => b.id - a.id)) {
+      listEl.append(window.renderIssue(it, { onChange: load, manageLink: isCoordinator }));
+    }
+  }
+  load();
+  // A report filed from this page shows up when its form closes.
+  document.addEventListener('close', load, true);
+</script>
+</body>
+</html>

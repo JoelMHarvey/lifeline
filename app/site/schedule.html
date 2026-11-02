@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Schedule</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+  main { display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: start; }
+  #cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .dayHead { font-size: 12px; color: var(--muted); text-align: center; padding: 4px 0;
+    text-transform: uppercase; letter-spacing: .05em; }
+  .day { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    min-height: 92px; padding: 4px 5px; font-size: 12px; }
+  .day.blank { background: transparent; border: none; }
+  .day .dnum { font-weight: 700; margin-bottom: 3px; }
+  .day.today { border-color: var(--accent); border-width: 2px; }
+  .slot { border-radius: 5px; padding: 1px 5px; margin-bottom: 2px; cursor: default;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .slot.open { background: #fee2e2; color: #991b1b; }
+  .slot.assigned { background: #fef3c7; color: #92400e; }
+  .slot.confirmed { background: #dcfce7; color: #166534; }
+  .slot.sub_requested { background: #fde68a; color: #92400e; outline: 2px dashed #f59e0b; }
+  .slot.mine { font-weight: 700; }
+  .slot .slotnote { font-size: 10px; opacity: .8; margin-left: 4px;
+    border: 1px solid currentColor; border-radius: 4px; padding: 0 3px; }
+  .daynote { font-size: 11px; color: var(--accent-dark); font-weight: 600;
+    margin-bottom: 3px; }
+  .daynote.clickable { cursor: pointer; }
+  .slot.clickable { cursor: pointer; }
+  .side .panel { margin-bottom: 14px; }
+  .side h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted); margin-bottom: 8px; }
+  .myslot { border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px;
+    margin-bottom: 6px; font-size: 13px; }
+  .avShift { display: flex; gap: 8px; align-items: center; font-size: 14px; margin: 2px 0; }
+  .avShift input { width: auto; flex: none; }
+  .avShiftWrap { margin-bottom: 2px; }
+  .avDays { display: flex; gap: 3px; margin: 2px 0 6px 24px; }
+  .dayBtn { font-size: 11px; padding: 1px 0; width: 26px; border: 1px solid var(--line);
+    border-radius: 5px; background: var(--panel); color: var(--muted); cursor: pointer; }
+  .dayBtn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .rosterGrp { font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted); margin: 8px 0 3px; font-weight: 700; }
+  .rosterGrp.gap { color: #991b1b; }
+  #rosterList p { margin: 0 0 3px; }
+  .seatsGrid { border-collapse: collapse; font-size: 12px; }
+  .seatsGrid th { font-weight: 600; padding: 0 2px 2px; text-align: center; }
+  .seatsGrid th:first-child { text-align: left; padding-right: 6px; }
+  .seatsGrid td { padding: 1px 2px; }
+  .seatsGrid input { width: 30px; padding: 2px 2px; text-align: center; }
+  .seatsGrid input.off { color: var(--muted); }
+  .ocsDef { margin-bottom: 6px; border: 1px solid var(--line); border-radius: 8px;
+    padding: 6px 10px; }
+  .ocsDef[open] { padding-bottom: 10px; }
+  .ocsName { font-weight: 700; font-size: 13px; cursor: pointer; display: flex;
+    flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+  .ocsDef[open] .ocsName { margin-bottom: 6px; }
+  .ocsSummary { font-weight: 400; font-size: 12px; color: var(--muted); }
+  #auditList p { margin: 0 0 4px; }
+  .logLink { display: inline-block; margin-top: 6px; font-size: 13px;
+    color: var(--accent-dark); font-weight: 600; }
+{{#features.shiftEditor}}  .shiftEd { display: flex; flex-direction: column; gap: 6px; font-size: 12px; padding: 4px 0; }
+  .shiftEd input[type=time] { width: 110px; }
+  .shiftEdTimes { display: flex; gap: 6px; flex-wrap: wrap; }
+{{/features.shiftEditor}}  .ocsRow { display: flex; gap: 6px; align-items: center; font-size: 12px; margin: 2px 0; }
+  .ocsRow input[type=checkbox] { width: auto; flex: none; }
+  .ocsRow .ocsDay { width: 30px; flex: none; }
+  .ocsRow input[type=time] { width: 112px; flex: none; font-size: 12px; padding: 1px 4px; }
+  .ocsRow input:disabled { opacity: .4; }
+  #rosterList a { color: inherit; font-weight: 600; text-decoration: underline;
+    text-decoration-color: var(--line); }
+  .legend span { display: inline-block; border-radius: 5px; padding: 1px 8px;
+    font-size: 12px; margin-right: 6px; }
+  /* On screen, times live in the hover tooltip and the availability panel;
+     the key is printed, since the sidebar isn't. */
+  #shiftKey { display: none; }
+  #slotDlg { margin: auto; border: 1px solid var(--line); border-radius: 12px; padding: 0;
+    width: min(560px, calc(100vw - 32px)); box-shadow: 0 12px 40px rgba(0,0,0,.2); }
+  #slotDlg::backdrop { background: rgba({{colors.deepRgb}}, .25); }
+  .dlgHead { display: flex; justify-content: space-between; gap: 10px;
+    padding: 14px 18px 10px; border-bottom: 1px solid var(--line); }
+  #dlgTitle { font-weight: 700; font-size: 16px; }
+  #dlgSub { font-size: 13px; }
+  .dlgClose { border: none; background: none; font-size: 22px; line-height: 1;
+    padding: 0 4px; cursor: pointer; color: var(--muted); }
+  #dlgBody { padding: 12px 18px 4px; }
+  #dlgBody h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted); margin: 14px 0 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .dlgRow { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+  .dlgLabel { width: 64px; flex: none; font-size: 13px; color: var(--muted); }
+  .dlgRow select, .dlgRow input[type=text] { flex: 1; min-width: 160px; width: auto; }
+  .dlgRow span > select { width: 100%; }
+  .dlgRow > span:not(.dlgLabel) { flex: 1; min-width: 160px; }
+  .dlgRow input[type=time] { width: 132px; flex: none; }
+  .dlgRow button { flex: none; }
+  .dlgFoot { display: flex; gap: 8px; justify-content: flex-end; margin: 14px 0 6px;
+    padding-top: 12px; border-top: 1px solid var(--line); }
+  .dlgFoot button.dlgDanger { background: var(--panel); color: var(--danger);
+    border-color: #f5c2c4; }
+  textarea.coverBody { width: 100%; font: inherit; font-size: 14px; line-height: 1.45;
+    margin: 4px 0 8px; }
+  .coverWho summary { cursor: pointer; font-size: 13px; color: var(--accent-dark); }
+  .coverWho p { font-size: 13px; margin: 4px 0 0; }
+  .coverWarn { font-size: 13px; color: var(--warn); margin: 6px 0 0; }
+  #dlgErr { color: var(--danger); font-size: 13px; padding: 0 18px 12px; }
+  #dlgErr:empty { display: none; }
+  #slotTip { position: fixed; z-index: 60; display: none; pointer-events: none;
+    background: var(--deep); color: #fff; font-size: 12px; line-height: 1.45;
+    padding: 6px 9px; border-radius: 7px; max-width: 260px; white-space: pre-line;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .18); }
+  .dwd { display: none; }
+  #schedTabs { display: none; }
+  /* Phones: one column, picked with the tabs; the month becomes a list of
+     days (weekday beside the date, empty lead-in days dropped) with the
+     shifts two to a row, big enough to tap. */
+  @media (max-width: 760px) {
+    h1 { font-size: 19px; }
+    .row { gap: 8px; margin: 8px 0; }
+    .row > span[style*="flex:1"] { display: none; }
+    .row button { padding: 7px 10px; font-size: 14px; }
+    #schedTabs { display: flex; position: sticky; top: 56px; z-index: 40;
+      background: var(--bg); margin: 4px 0 10px; border-bottom: 1px solid var(--line); }
+    #schedTabs button { flex: 1; border: none; border-radius: 0; background: none;
+      padding: 10px 4px; font-weight: 600; color: var(--muted);
+      border-bottom: 3px solid transparent; }
+    #schedTabs button.on { color: var(--accent-dark); border-bottom-color: var(--accent); }
+    main { grid-template-columns: 1fr; }
+    main[data-tab="cal"] .side, main[data-tab="side"] #calCol { display: none; }
+    #cal { grid-template-columns: 1fr; gap: 8px; }
+    .dayHead, .day.blank { display: none; }
+    .day { min-height: 0; padding: 8px 10px; font-size: 14px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4px 6px; align-content: start; }
+    .day .dnum, .day .daynote { grid-column: 1 / -1; margin-bottom: 0; }
+    #todayCell { scroll-margin-top: 110px; }
+    .dwd { display: inline; font-weight: 400; color: var(--muted); margin-left: 6px; }
+    .slot { padding: 5px 8px; margin: 0; white-space: normal; }
+    .day > .muted { font-size: 13px !important; padding: 4px 0; }
+  }
+  @media print {
+    #shiftKey { display: block; }
+    #slotTip { display: none !important; }
+    .side, .row, header, .legend { display: none !important; }
+    main { grid-template-columns: 1fr; }
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">Shift schedule</h1>
+<div class="row">
+  <button id="prevBtn">‹</button>
+  <strong id="monthLabel" style="min-width:130px;text-align:center"></strong>
+  <button id="nextBtn">›</button>
+  <span class="legend" style="margin-left:10px">
+    <span class="slot open">unstaffed</span>
+    <span class="slot assigned">assigned</span>
+    <span class="slot confirmed">confirmed</span>
+    <span class="slot sub_requested">cover wanted</span>
+  </span>
+  <span style="flex:1"></span>
+  <button id="printBtn">Print</button>
+  <button id="calFeedBtn" title="Subscribe from your own calendar app">Calendar feed</button>
+  <button id="genBtn" style="display:none" class="primary">Create month's slots</button>
+  <button id="autofillBtn" style="display:none" class="primary"
+    title="Draft assignments for every open slot from submitted availability">
+    Auto-fill from availability</button>
+</div>
+
+<!-- Phones: the calendar, or your own shifts / availability / team tools. -->
+<div id="schedTabs" role="tablist">
+  <button data-tab="cal" role="tab">Calendar</button>
+  <button data-tab="side" role="tab">My shifts &amp; availability</button>
+</div>
+<main data-tab="cal">
+  <div id="calCol">
+    <div id="cal"></div>
+    <p class="muted" id="shiftKey" style="margin-top:8px"></p>
+    <div id="slotTip" role="tooltip"></div>
+    <dialog id="slotDlg">
+      <div class="dlgHead">
+        <div>
+          <div id="dlgTitle"></div>
+          <div id="dlgSub" class="muted"></div>
+        </div>
+        <button type="button" class="dlgClose" aria-label="Close"
+          onclick="document.getElementById('slotDlg').close()">×</button>
+      </div>
+      <div id="dlgBody"></div>
+      <p id="dlgErr"></p>
+    </dialog>
+  </div>
+  <div class="side">
+    <div class="panel">
+      <h3>My shifts</h3>
+      <div id="mySlots"><p class="muted">None assigned.</p></div>
+    </div>
+    <div class="panel">
+      <h3>Shifts needing cover</h3>
+      <div id="coverList"><p class="muted">None.</p></div>
+    </div>
+    <div class="panel">
+      <h3>My availability — <span id="avMonth"></span></h3>
+      <p class="muted" style="margin-bottom:6px">Submit every month, even if you are away.
+        Due by the last day of the month before the month being scheduled.
+        Tick a shift, then untap any weekdays you can't do it on.</p>
+      <div id="avShifts"></div>
+      <label style="font-size:14px;margin-top:6px;display:block">Shifts I'd like this month
+        <input id="avDesired" type="number" min="0" max="31" style="width:80px"></label>
+      <label style="font-size:14px;margin-top:6px;display:block">Only, Nots and Also
+        <textarea id="avNotes" rows="2"
+          placeholder="e.g. ONLY S3 on the 12th; NOT the 3rd Monday; also happy to cover late shifts"></textarea>
+      </label>
+      <button class="primary" id="avSubmit" style="margin-top:8px;width:100%">Submit availability</button>
+      <p class="muted" id="avState" style="margin-top:4px"></p>
+    </div>
+    <div class="panel" id="rosterPanel">
+      <h3>Availability roster</h3>
+      <input id="rosterFilter" placeholder="Filter names…"
+        style="display:none;margin-bottom:6px;font-size:13px;width:100%">
+      <div id="missingBox" style="display:none;margin-bottom:8px;font-size:13px">
+        <button id="remindBtn" style="font-size:12px;padding:2px 8px">
+          Email a reminder to those missing</button>
+        <p class="muted" id="remindState" style="margin-top:4px"></p>
+      </div>
+      <!-- Scrolls inside the panel: 150 names would otherwise run for metres. -->
+      <div id="rosterList" class="muted"
+        style="font-size:13px;max-height:440px;overflow-y:auto">—</div>
+    </div>
+    <div class="panel">
+      <h3>My hours</h3>
+      <div id="statsBox" class="muted" style="font-size:13px">—</div>
+    </div>
+    <div class="panel" id="seatsPanel" style="display:none">
+      <h3>People per shift</h3>
+      <p class="muted" style="font-size:12px;margin-bottom:6px">How many support workers
+        each shift needs at once, by day of the week. <strong>0</strong> means the shift
+        doesn't run that day. Used when a month's slots are created; for a month
+        already created, press <strong>Create month's slots</strong> again to add
+        extra seats (lowering a number never removes anyone).</p>
+      <div id="seatsEditor"></div>
+    </div>
+    <div class="panel" id="ocsPanel" style="display:none">
+      <h3>Supervisor hours</h3>
+      <p class="muted" style="font-size:12px;margin-bottom:6px">Which days each On Call
+        Supervisor block runs, and its hours, used when a month's slots are created.
+        Open a block to change it; to change one night only, click that slot.</p>
+      <div id="ocsEditor"></div>
+    </div>{{#features.shiftEditor}}
+    <div class="panel" id="shiftEdPanel" style="display:none">
+      <h3>Shifts</h3>
+      <p class="muted" style="font-size:12px;margin-bottom:6px">Each shift's name,
+        hours, takeover time and whether it covers phone, chat or both. New hours
+        apply from today: past slots keep the hours they were worked. Months already
+        created follow the new hours unless a slot has its own.</p>
+      <div id="shiftEditor"></div>
+    </div>{{/features.shiftEditor}}
+    <div class="panel" id="auditPanel" style="display:none">
+      <h3>Recent changes</h3>
+      <div id="auditList" class="muted" style="font-size:12px">—</div>
+      <a href="changes.html" target="_blank" rel="noopener" class="logLink">See the full log of changes ↗</a>
+    </div>
+  </div>
+</main>
+
+<script src="schedule.js"></script>{{#features.shiftEditor}}
+<script src="shifteditor.js"></script>{{/features.shiftEditor}}
+</body>
+</html>

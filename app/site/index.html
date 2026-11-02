@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{name}}</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { display: flex; align-items: center; justify-content: center; height: 100vh; }
+  .panel { width: 420px; }
+  a.big { display: block; padding: 14px; border: 1px solid var(--line); border-radius: 10px;
+          margin-top: 10px; text-decoration: none; color: var(--ink); }
+  a.big:hover { background: var(--soft); }
+</style>
+</head>
+<body>
+<div class="panel">
+  <h2 class="brand">{{name}}</h2>
+{{#text.indexNotice}}  <p class="muted" style="margin-top:6px">{{text.indexNotice}}</p>
+{{/text.indexNotice}}  <a class="big" href="caller.html"><strong>Caller chat widget</strong><br>
+    <span class="muted">What a person reaching out sees</span></a>
+  <a class="big" href="console.html"><strong>Support worker console</strong><br>
+    <span class="muted">Queue, chat, intake, canned responses</span></a>
+  <a class="big" href="wallboard.html"><strong>Supervisor wallboard</strong><br>
+    <span class="muted">Live queue and shift stats</span></a>
+</div>
+<script>
+  // Scheduler-only installations have no caller side: go straight to sign-in.
+  fetch('/api/modules').then((r) => r.json()).then((d) => {
+    if (d.modules && !d.modules.includes('helpline')) location.replace('console.html');
+  }).catch(() => {});
+</script>
+</body>
+</html>

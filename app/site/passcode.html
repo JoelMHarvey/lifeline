@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{name}} — team passcode</title>
+<!-- Self-contained on purpose: this page must render before the gate lets
+     anything else through, so no shared.css, no nav.js. -->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Hiragino Sans", sans-serif;
+    background: {{colors.bg}}; color: {{colors.ink}}; font-size: 15px; line-height: 1.5;
+    display: flex; align-items: center; justify-content: center; height: 100vh;
+  }
+  .card {
+    background: #fff; border: 1px solid {{colors.line}}; border-radius: 12px;
+    border-top: 4px solid {{colors.accent}}; padding: 24px; width: 360px;
+    box-shadow: 0 1px 3px rgba({{colors.deepRgb}}, .05);
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif; font-size: 20px;
+    display: flex; align-items: center; gap: 9px; margin-bottom: 8px;
+  }
+  h1::before {
+    content: ''; width: .85em; height: .85em; flex: none;
+    background: url("{{logo.cssUrl}}") no-repeat;
+    background-size: contain;
+  }
+  p { color: {{colors.muted}}; font-size: 13px; margin-bottom: 14px; }
+  input {
+    font: inherit; width: 100%; border: 1px solid {{colors.line}}; border-radius: 6px;
+    padding: 8px 10px; margin-bottom: 10px;
+  }
+  input:focus { outline: 2px solid {{colors.soft}}; border-color: {{colors.accent}}; }
+  button {
+    font: inherit; font-weight: 600; width: 100%; border: none; cursor: pointer;
+    background: {{colors.accent}}; color: #fff; border-radius: 6px; padding: 9px;
+  }
+  button:hover { background: {{colors.accentDark}}; }
+  #err { color: #d7282f; font-size: 13px; margin: 8px 0 0; display: none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>{{name}}{{text.siteLabel}}</h1>
+  <p>{{text.passcodeIntro}}Enter the team passcode you were given — you'll only be
+     asked once on this device.</p>
+  <input id="code" type="password" placeholder="Team passcode" autocomplete="off" autofocus>
+  <button id="go">Continue</button>
+  <p id="err"></p>
+</div>
+<script>
+const go = async () => {
+  const err = document.getElementById('err');
+  err.style.display = 'none';
+  const res = await fetch('/api/passcode', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: document.getElementById('code').value }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    err.textContent = data.error || 'That didn’t work — try again.';
+    err.style.display = 'block';
+    return;
+  }
+  // Only ever bounce to one of our own pages.
+  const next = new URLSearchParams(location.search).get('next') || '';
+  location.href = /^[a-z0-9_-]+\.html$/.test(next) ? '/' + next : '/console.html';
+};
+document.getElementById('go').onclick = go;
+document.getElementById('code').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') go();
+});
+</script>
+</body>
+</html>

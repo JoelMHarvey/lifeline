@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} — Set up</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px 16px 40px; }
+  #wiz { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  #steps { display: flex; gap: 4px; flex-wrap: wrap; list-style: none; padding: 0; font-size: 12px; }
+  #steps li { padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: var(--panel); }
+  #steps li.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  #steps li.done { color: var(--ink); }
+  #steps button { all: unset; cursor: pointer; }
+  .field { display: flex; flex-direction: column; gap: 3px; margin-bottom: 12px; font-size: 14px; }
+  .field .hint { font-size: 12px; color: var(--muted); }
+  .field .err { font-size: 12px; color: var(--danger); min-height: 0; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 560px) { .row2 { grid-template-columns: 1fr; } }
+  .nav { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; }
+  .warnBox { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 8px 12px; font-size: 13px; }
+  .okBox { background: #dcfce7; border: 1px solid #86efac; border-radius: 8px; padding: 8px 12px; font-size: 13px; }
+  table.grid { border-collapse: collapse; font-size: 12px; width: 100%; }
+  table.grid th, table.grid td { padding: 3px 4px; text-align: left; }
+  table.grid input[type=text] { min-width: 90px; }
+  table.grid input[type=time] { width: 104px; }
+  table.grid input[type=number] { width: 44px; text-align: center; }
+  .checks li { margin: 4px 0; list-style: none; font-size: 14px; }
+  .checks { padding: 0; }
+  #preview { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; font-size: 13px; }
+  #preview .pvNav { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #fff;
+    border-bottom: 3px solid var(--pv-accent); font-family: Georgia, serif; font-weight: 700; color: var(--pv-deep); }
+  #preview .pvLogo { width: 18px; height: 18px; background-size: contain; background-repeat: no-repeat; }
+  #preview .pvBody { padding: 12px; background: #f6f8fb; display: flex; flex-direction: column; gap: 8px; }
+  #preview .pvStrip { background: #fff7ed; border: 1px solid #fdba74; border-radius: 10px; padding: 8px 10px; }
+  #preview .pvCard { background: #fff; border: 1px solid #e2e8f0; border-top: 4px solid var(--pv-accent); border-radius: 10px; padding: 10px; }
+  #preview .pvBtn { display: inline-block; background: var(--pv-accent); color: #fff; border-radius: 6px; padding: 5px 12px; margin-top: 6px; }
+  #qr img { width: 180px; height: 180px; }
+</style>
+</head>
+<body>
+<div id="wiz">
+  <h1 class="brand">Set up your lifeline</h1>
+  <ol id="steps"></ol>
+  <div class="panel" id="body"><p class="muted">Loading…</p></div>
+</div>
+<script src="wizard.js"></script>
+</body>
+</html>

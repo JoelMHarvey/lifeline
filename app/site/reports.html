@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Reports</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin: 12px 0; }
+  .row label { font-size: 13px; }
+  .row input { width: auto; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px; margin: 14px 0; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; }
+  .tile .n { font-size: 26px; font-weight: 700; }
+  .tile .k { font-size: 12px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 6px 0 18px; }
+  td, th { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line); }
+  td.n { text-align: right; font-variant-numeric: tabular-nums; }
+  h3 { font-size: 14px; margin-top: 18px; }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">Service reports</h1>
+<p class="muted">Aggregates only — counts and labels, never content or names. Field
+  breakdowns come from submitted intakes, labelled against the form version each
+  record was written under.</p>
+
+<div class="panel" style="margin-top:14px">
+  <div class="row" style="margin:0">
+    <label>From <input id="from" type="date"></label>
+    <label>To <input id="to" type="date"></label>
+    <button class="primary" id="runBtn">Run</button>
+    <button id="csvBtn" disabled>Download CSV</button>
+  </div>
+</div>
+
+<div id="out"></div>
+
+<script src="reports.js"></script>
+</body>
+</html>

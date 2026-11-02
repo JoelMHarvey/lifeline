@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Resources</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
+  td, th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin: 12px 0; }
+  .row label { font-size: 13px; }
+  .row input { width: auto; }
+  .cat { font-weight: 600; background: var(--soft); }
+  #importResult .counts { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 6px; }
+  #importResult .counts span { border-radius: 999px; padding: 2px 10px; font-size: 13px;
+    background: var(--soft); }
+  #importResult .a-add { color: var(--ok); } #importResult .a-update { color: var(--accent-dark); }
+  #importResult .a-skip { color: var(--muted); } #importResult .a-error { color: var(--danger); }
+  #importResult table { font-size: 13px; }
+  #importResult .scroll { max-height: 320px; overflow-y: auto; border: 1px solid var(--line);
+    border-radius: 8px; margin-top: 6px; }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">Resource directory</h1>
+<p class="muted">Referrals are made from the console during a chat; this page is for browsing,
+suggesting new resources, and (coordinators) editing the directory.</p>
+
+<div class="panel" style="margin-top:14px">
+  <div class="row" style="margin:0">
+    <label style="flex:1">Search <input id="q" placeholder="Name, category or description"></label>
+  </div>
+  <table id="tbl"></table>
+</div>
+
+<div class="panel" style="margin-top:14px">
+  <h3 style="margin-bottom:6px">Suggest a resource</h3>
+  <p class="muted">Suggestions go to a coordinator for approval before they appear in the directory{{#legacy.board}}
+    (replaces the {{legacy.board}} "Additions to Resources" thread){{/legacy.board}}.</p>
+  <div class="row">
+    <label>Name <input id="sName"></label>
+    <label>Category <input id="sCategory" list="categoryList" placeholder="e.g. Counseling & Support"></label>
+    <!-- {{#legacy.system}}{{legacy.system}}'s taxonomy, as used in {{org}}'s live directory{{/legacy.system}}{{^legacy.system}}Common categories{{/legacy.system}} — free text still
+         allowed, these are suggestions so the tree stays tidy. -->
+    <datalist id="categoryList">
+      <option value="Counseling & Support"></option>
+      <option value="Crisis lines"></option>
+      <option value="Daily Life"></option>
+      <option value="Education"></option>
+      <option value="Emergencies"></option>
+      <option value="Government and Social Services"></option>
+      <option value="Health"></option>
+      <option value="Legal & Business"></option>
+      <option value="Religion"></option>
+      <option value="Transportation and Travel"></option>
+      <option value="Utilities & Public Services"></option>
+    </datalist>
+    <label>Phone <input id="sPhone"></label>
+    <label>URL <input id="sUrl"></label>
+  </div>
+  <div class="row">
+    <label style="flex:1">Description <input id="sDesc"></label>
+    <button class="primary" id="suggestBtn">Suggest</button>
+  </div>
+  <p class="muted" id="suggestMsg"></p>
+</div>
+
+<div class="panel" style="margin-top:14px;display:none" id="pendingPanel">
+  <h3 style="margin-bottom:6px">Pending suggestions (coordinator)</h3>
+  <table id="pendingTbl"></table>
+</div>
+
+<div class="panel" style="margin-top:14px;display:none" id="importPanel">
+  <h3 style="margin-bottom:6px">Import from a spreadsheet (coordinator)</h3>
+  <p class="muted" style="margin-bottom:8px">A CSV file with a header row — at least a
+    <strong>Name</strong> column, and any of Category, Description, Website, Phone and
+    Languages (common spellings like "Agency name" or "Telephone" are recognised).
+    Save from Excel or Google Sheets as CSV. You'll see what will happen before
+    anything changes. <a href="#" id="templateLink">Download a template</a></p>
+  <div class="row" style="align-items:center">
+    <input type="file" id="importFile" accept=".csv,.txt,text/csv" style="width:auto">
+    <label style="font-size:14px;display:flex;gap:6px;align-items:center">
+      <input type="checkbox" id="importUpdate" style="width:auto">
+      Update resources already in the directory</label>
+    <button id="previewBtn">Preview</button>
+  </div>
+  <div id="importResult"></div>
+</div>
+
+<script src="resources.js"></script>
+</body>
+</html>

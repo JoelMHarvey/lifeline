@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{shortName}} Ops</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 20px; max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted); margin: 16px 0 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  td, th { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line);
+    vertical-align: top; }
+  td.msg { font-family: monospace; font-size: 12px; word-break: break-all; }
+  .envgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 6px; }
+  .envgrid div { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px;
+    font-size: 13px; }
+  .issueTabs { display: flex; gap: 6px; margin-bottom: 10px; }
+  .issueTabs button { font-size: 13px; padding: 4px 12px; }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<h1 class="brand">Operations</h1>
+<p class="muted">Coordinator only. Health, configuration, and the last recorded errors —
+the first place to look before platform logs. External monitors ping
+<code>/healthz</code>, <code>/api/cron/sweep</code> and <code>/api/cron/ops-check</code>.</p>
+
+<div class="panel" style="margin-top:14px" id="issues">
+  <h3 style="margin-top:0">Problems &amp; requests <span id="issueCount"></span></h3>
+  <p class="muted" style="font-size:13px;margin-bottom:8px">Reported by testers and staff
+    from "Report a problem" in the menu; you're emailed each new one. Most urgent first.
+    Changing the status or adding a note emails the reporter.</p>
+  <div class="issueTabs">
+    <button data-scope="open" class="primary">Open</button>
+    <button data-scope="closed">Fixed &amp; closed</button>
+    <button data-scope="all">All</button>
+  </div>
+  <div id="issueList" class="muted">Loading…</div>
+</div>
+
+<div class="panel" style="margin-top:14px">
+  <h3 style="margin-top:0">Health</h3>
+  <div id="health" class="muted">Loading…</div>
+  <h3>Configuration</h3>
+  <div class="envgrid" id="envGrid"></div>
+  <h3>Email</h3>
+  <p id="mailStatus" class="muted">—</p>
+  <p style="margin-top:10px">
+    <button id="testNotifyBtn">Send test notifications</button>
+    <span class="muted" id="testResult"></span>
+  </p>
+  <h3>Backups</h3>
+  <p class="muted" style="margin-bottom:8px">One encrypted file of the whole
+    database (AES-256-GCM under the app key). Keep copies somewhere {{org}}
+    controls, apart from the key — the key is the restore credential.
+    Restore with <code>tools/restore-backup.js</code>.</p>
+  <p><a href="/api/admin/backup"><button>Download encrypted backup</button></a></p>
+</div>
+
+<div class="panel" style="margin-top:14px">
+  <h3 style="margin-top:0">Events (last 24h)</h3>
+  <div id="events" class="muted">—</div>
+</div>
+
+<div class="panel" style="margin-top:14px">
+  <h3 style="margin-top:0">Recent unhandled errors</h3>
+  <table id="errTbl"></table>
+</div>
+
+<script src="issuecard.js"></script>
+<script src="ops.js"></script>
+</body>
+</html>
